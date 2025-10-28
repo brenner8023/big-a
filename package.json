@@ -1,0 +1,19 @@
+{
+  "name": "big-a",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "sc": "node src/get_code.js",
+    "h": "pnpm history && pnpm daily",
+    "history": "node src/get_history.js",
+    "daily": "node src/format_daily.js",
+    "score": "node src/score.js",
+    "vol": "node src/vol.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.19.0"
+}
