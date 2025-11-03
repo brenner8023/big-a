@@ -5,7 +5,7 @@
 const fs = require('node:fs')
 const path = require('node:path')
 
-const { ALL_STOCKS, CACHE_DIR, TOKEN, UPDATE_CONFIG } = require('./config')
+const { getAllStocks, CACHE_DIR, TOKEN, UPDATE_CONFIG } = require('./config')
 
 const getDailyData = async (tsCode, stockMap, dailyDataMap) => {
   const body = {
@@ -55,8 +55,9 @@ async function main() {
   if (!fs.existsSync(CACHE_DIR)) {
     fs.mkdirSync(CACHE_DIR)
   }
-  for (let i = 0; i < ALL_STOCKS.length + limit - 1; i += limit) {
-    queue.push(ALL_STOCKS.slice(i, i + limit))
+  const stocks = getAllStocks()
+  for (let i = 0; i < stocks.length + limit - 1; i += limit) {
+    queue.push(stocks.slice(i, i + limit))
   }
   for (const items of queue) {
     const tsCode = items.map((item) => item.code).join(',')

@@ -34,21 +34,26 @@ async function main() {
   const result = await Promise.all(resList.map((item) => item.json()))
   const szArr = [] // 深市主板
   const shArr = [] // 沪市主板
+  const zszMap = {}
   result.forEach((_item) => {
     _item.data.rank_list.forEach((item) => {
       const st = item.name.includes('ST')
       const sz = item.code.startsWith('sz0') && !st
       const sh = item.code.startsWith('sh60') && !st
       if (sz) {
+        const code = item.code.replace('sz', '') + '.SZ'
         szArr.push({
-          code: item.code.replace('sz', '') + '.SZ',
+          code,
           name: item.name,
         })
+        zszMap[code] = Number(item.zsz)
       } else if (sh) {
+        const code = item.code.replace('sh', '') + '.SH'
         shArr.push({
-          code: item.code.replace('sh', '') + '.SH',
+          code,
           name: item.name,
         })
+        zszMap[code] = Number(item.zsz)
       }
     })
   })
@@ -57,6 +62,7 @@ async function main() {
   }
   fs.writeFileSync(path.join(CODE_DIR, 'sz.json'), JSON.stringify(szArr, null, 2))
   fs.writeFileSync(path.join(CODE_DIR, 'sh.json'), JSON.stringify(shArr, null, 2))
+  fs.writeFileSync(path.join(CODE_DIR, 'zsz.json'), JSON.stringify(zszMap, null, 2))
   console.log('深市主板', szArr.length)
   console.log('沪市主板', shArr.length)
 }

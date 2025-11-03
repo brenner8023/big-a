@@ -1,7 +1,7 @@
 const path = require('node:path')
 const fs = require('node:fs')
 
-const { WORKDAYS, ALL_STOCKS, DAILY_DIR, CACHE_DIR } = require('./config')
+const { WORKDAYS, getAllStocks, DAILY_DIR, CACHE_DIR } = require('./config')
 
 // 根据输入日期获取这段日期内所有的工作日
 function getWorkdays(start, end) {
@@ -31,7 +31,7 @@ function main() {
     const cacheFile = path.join(CACHE_DIR, `./${workday}.json`)
     if (fs.existsSync(cacheFile)) {
       const dailyData = require(cacheFile)
-      ALL_STOCKS.forEach((stockItem) => {
+      getAllStocks().forEach((stockItem) => {
         const code = stockItem.code
         const currData = dailyData[code]
         if (currData) {

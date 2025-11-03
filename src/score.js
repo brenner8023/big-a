@@ -1,68 +1,15 @@
 const path = require('node:path')
 
 const { DAILY_DIR } = require('./config')
+const { calcMACD } = require('./tools')
 
 const target = [
   '600036.SH_招商银行',
   '603225.SH_新凤鸣',
   '603050.SH_科林电气',
-  '603178.SH_圣龙股份',
   '002670.SZ_国盛证券',
-  '000571.SZ_新大洲A',
-  '600375.SH_汉马科技',
   '002548.SZ_金新农',
 ]
-
-/**
- * 计算指数移动平均线（EMA）
- * @param {Array} data - 价格数据数组
- * @param {number} period - 周期
- * @returns {Array} EMA数组
- */
-function calculateEMA(data, period) {
-  const k = 2 / (period + 1)
-  const ema = []
-
-  // 第一个EMA值使用简单平均值
-  let sum = 0
-  for (let i = 0; i < period; i++) {
-    sum += data[i]
-  }
-  ema[period - 1] = sum / period
-
-  // 计算后续EMA值
-  for (let i = period; i < data.length; i++) {
-    ema[i] = data[i] * k + ema[i - 1] * (1 - k)
-  }
-
-  return ema
-}
-
-/**
- * 计算MACD指标
- * @param {Array} dailyData - 日线数据数组
- * @returns {Object} 包含dif和dea的对象
- */
-function calcMACD(dailyData) {
-  // 从日线数据中提取收盘价
-  const closes = dailyData.map((item) => item[4])
-
-  // 计算EMA12和EMA26
-  const ema12 = calculateEMA(closes, 12)
-  const ema26 = calculateEMA(closes, 26)
-
-  // 计算DIF线
-  const dif = []
-  for (let i = 25; i < closes.length; i++) {
-    // EMA26从第26个数据点开始有效
-    dif.push(ema12[i] - ema26[i])
-  }
-
-  // 计算DEA线（DIF的9日EMA）
-  const dea = calculateEMA(dif, 9)
-
-  return { dif, dea }
-}
 
 function isMACDDead(dif, dea) {
   const len = dif.length
@@ -89,7 +36,11 @@ function main() {
 
     const { dif, dea } = calcMACD(dailyData)
 
-    const rules = [volCount > 0 ? 1 : 0, currClose >= close13 ? 1 : 0, isMACDDead(dif, dea) ? 0 : 1]
+    const rules = [
+      volCount > 0 ? 1 : 0, // 5天内是否红肥绿瘦
+      currClose >= close13 ? 1 : 0, // 当前收盘价是否大于等于ma13
+      isMACDDead(dif, dea) ? 0 : 1, // MACD是否死叉
+    ]
     const score = rules.reduce((total, curr) => total + curr, 0)
     result.push({ id: stockItem, score, rules })
   })
