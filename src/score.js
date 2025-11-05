@@ -1,7 +1,7 @@
 const path = require('node:path')
 
 const { DAILY_DIR, POSITIONS } = require('./config')
-const { calcMACD } = require('./tools')
+const { calcMACD, calcBBI } = require('./tools')
 
 function isMACDDead(dif, dea) {
   const len = dif.length
@@ -15,8 +15,6 @@ function main() {
   const result = []
   POSITIONS.forEach((stockItem) => {
     const dailyData = require(path.join(DAILY_DIR, `./${stockItem}.json`))
-    const total13 = dailyData.slice(-13).reduce((total, item) => total + item[4], 0)
-    const close13 = total13 / 13
     const currClose = dailyData[dailyData.length - 1][4]
 
     let volCount = 0
@@ -35,11 +33,12 @@ function main() {
     vol10 = vol10 / 10
 
     const { dif, dea } = calcMACD(dailyData)
+    const bbi = calcBBI(dailyData)
 
     const rules = [
       volCount > 0 ? 1 : 0, // 5天内是否红肥绿瘦
       maxGreenVol > vol10 ? 0 : 1, // 5天内是否有放巨量的阴线
-      currClose >= close13 ? 1 : 0, // 当前收盘价是否大于等于ma13
+      currClose >= bbi[bbi.length - 1] ? 1 : 0, // 收盘价是否在BBI上方
       isMACDDead(dif, dea) ? 0 : 1, // MACD是否死叉
     ]
     const score = rules.reduce((total, curr) => total + curr, 0)
