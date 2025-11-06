@@ -16,7 +16,7 @@ fs.readdir(DAILY_DIR, (err, files) => {
     let redCount = 0
     let greenCount = 0
     const maxVols = []
-    data.slice(-30).forEach((item) => {
+    data.slice(-30, -1).forEach((item) => {
       const pct_chg = item[5]
       const volume = item[6]
       if (pct_chg > 0) {
@@ -37,7 +37,7 @@ fs.readdir(DAILY_DIR, (err, files) => {
     const code = file.split('_')[0]
     const { J } = calcKDJ(data, 9)
     const flag1 = maxVols.every((i) => i.pct_chg > 0)
-    const flag2 = redCount > 1.3 * greenCount
+    const flag2 = redCount > 1.2 * greenCount
     const flag3 = data[data.length - 1][5] >= 4
     const flag4 = zszMap[code] > 50
     const flag = flag1 && flag2 && flag3 && flag4 && J <= 55

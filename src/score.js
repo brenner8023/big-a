@@ -37,7 +37,7 @@ function main() {
 
     const rules = [
       volCount > 0 ? 1 : 0, // 5天内是否红肥绿瘦
-      maxGreenVol > vol10 ? 0 : 1, // 5天内是否有放巨量的阴线
+      maxGreenVol > 1.1 * vol10 ? 0 : 1, // 5天内是否有放巨量的阴线
       currClose >= bbi[bbi.length - 1] ? 1 : 0, // 收盘价是否在BBI上方
       isMACDDead(dif, dea) ? 0 : 1, // MACD是否死叉
     ]
