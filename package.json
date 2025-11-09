@@ -7,9 +7,10 @@
     "sc": "node src/get_code.js",
     "history": "node src/get_history.js",
     "daily": "node src/format_daily.js",
-    "score": "node src/score.js",
+    "score": "node src/score.js && pnpm analysis",
     "vol": "node src/vol.js",
     "b2": "node src/b2.js",
+    "analysis": "node src/analysis.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
