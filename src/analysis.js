@@ -4,7 +4,16 @@ const { CACHE_DIR, CODE_DIR } = require('./config')
 
 const zszMap = require(path.join(CODE_DIR, './zsz.json'))
 
-const dateList = ['20251103', '20251104', '20251105', '20251106', '20251107']
+const dateList = [
+  '20251103',
+  '20251104',
+  '20251105',
+  '20251106',
+  '20251107',
+  '20251110',
+  '20251111',
+  '20251112',
+]
 
 function main() {
   const result = {}
@@ -45,7 +54,17 @@ function main() {
       大盘股: getMiddleData(largeStocks)[7],
     }
   })
-  console.log('涨跌幅中位数:')
+  console.log('主板涨跌幅中位数:')
   console.log(result)
+  const vals = Object.values(result)
+  const getTotal = (key) => {
+    return vals.reduce((acc, cur) => acc + acc * cur[key], 1).toFixed(2)
+  }
+  console.log('月初至今：', {
+    总体: getTotal('总体'),
+    小盘股: getTotal('小盘股'),
+    中盘股: getTotal('中盘股'),
+    大盘股: getTotal('大盘股'),
+  })
 }
 main()
