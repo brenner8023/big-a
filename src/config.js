@@ -12,11 +12,9 @@ exports.DAILY_DIR = path.join(root, './daily')
 const CODE_DIR = path.join(root, './code')
 exports.CODE_DIR = CODE_DIR
 
-exports.TOKEN = ''
-
 exports.UPDATE_CONFIG = {
-  start: '20250401',
-  end: '20250601',
+  start: '20251001',
+  end: '20251201',
 }
 
 exports.POSITIONS = [

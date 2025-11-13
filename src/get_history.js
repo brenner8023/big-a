@@ -5,7 +5,8 @@
 const fs = require('node:fs')
 const path = require('node:path')
 
-const { getAllStocks, CACHE_DIR, TOKEN, UPDATE_CONFIG } = require('./config')
+const { getAllStocks, CACHE_DIR, UPDATE_CONFIG } = require('./config')
+const { TOKEN } = require('./token')
 
 const getDailyData = async (tsCode, stockMap, dailyDataMap) => {
   const body = {
