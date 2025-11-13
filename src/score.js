@@ -1,7 +1,9 @@
 const path = require('node:path')
 
-const { DAILY_DIR, POSITIONS } = require('./config')
-const { calcMACD, calcBBI } = require('./tools')
+const { DAILY_DIR, POSITIONS, CODE_DIR } = require('./config')
+const { calcMACD, calcBBI, getStockPos } = require('./tools')
+
+const zszMap = require(path.join(CODE_DIR, './zsz.json'))
 
 function isMACDDead(dif, dea) {
   const len = dif.length
@@ -13,8 +15,8 @@ function isMACDDead(dif, dea) {
 
 function main() {
   const result = []
-  POSITIONS.forEach((stockItem) => {
-    const dailyData = require(path.join(DAILY_DIR, `./${stockItem}.json`))
+  POSITIONS.forEach((code) => {
+    const dailyData = require(path.join(DAILY_DIR, `./${code}.json`))
     const currClose = dailyData[dailyData.length - 1][4]
 
     let volCount = 0
@@ -42,9 +44,12 @@ function main() {
       isMACDDead(dif, dea) ? 0 : 1, // MACD是否死叉
     ]
     const score = rules.reduce((total, curr) => total + curr, 0)
-    result.push({ id: stockItem, score, rules })
+    const pos = getStockPos(code)
+    const name = zszMap[code].name
+    result.push({ id: `${code}_${name}`, score, rules, pos })
   })
   result.sort((a, b) => b.score - a.score)
+  console.log('100w账户，账户波动0.5%为例')
   console.log(result)
 }
 main()

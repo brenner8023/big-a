@@ -2,7 +2,7 @@ const fs = require('node:fs')
 const path = require('node:path')
 
 const { DAILY_DIR, CODE_DIR } = require('./config')
-const { calcKDJ, getSlope } = require('./tools')
+const { calcKDJ, getSlope, getStockPos } = require('./tools')
 
 fs.readdir(DAILY_DIR, (err, files) => {
   if (err) throw err
@@ -34,18 +34,20 @@ fs.readdir(DAILY_DIR, (err, files) => {
         }
       }
     })
-    const code = file.split('_')[0]
+    const code = file.replace('.json', '')
+    const name = zszMap[code].name
     const slope = getSlope(data, 5).toFixed(4)
+    const pos = getStockPos(code)
     const { J } = calcKDJ(data, 9)
     const flag1 = maxVols.every((i) => i.pct_chg > 0)
-    const flag2 = redCount > 1.3 * greenCount
+    const flag2 = redCount > 1.4 * greenCount
     const flag3 = slope < 0.15 && slope > -0.15
-    const flag4 = zszMap[code] > 50
-    const flag = flag1 && flag2 && flag3 && flag4 && J <= 20
+    const flag4 = zszMap[code].zsz > 50
+    const flag = flag1 && flag2 && flag3 && flag4 && J <= 13
     if (flag) {
       result.push({
-        file,
-        slope,
+        id: `${code}_${name}`,
+        pos,
         rate: (redCount / greenCount).toFixed(2),
       })
     }

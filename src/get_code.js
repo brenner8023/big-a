@@ -1,6 +1,6 @@
 /**
- * @file https://stockapp.finance.qq.com/mstats/http:/gu.qq.com/i/#mod=list&id=hs_hsj&module=hs&type=hsj
- * 从腾讯证券获取个股列表
+ * @file https://vip.stock.finance.sina.com.cn/mkt/#stock_hs_up
+ * 从新浪财经获取个股列表
  */
 
 const fs = require('node:fs')
@@ -8,52 +8,57 @@ const path = require('node:path')
 
 const { CODE_DIR } = require('./config')
 
-const getUrl = (offset, count = 100) => {
-  return `https://proxy.finance.qq.com/cgi/cgi-bin/rank/hs/getBoardRankList?_appver=11.17.0&board_code=aStock&sort_type=price&direct=down&offset=${offset}&count=${count}`
+const getUrl = (page, count) => {
+  return `https://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=${page}&num=${count}&sort=changepercent&asc=0&node=hs_a&symbol=&_s_r_a=page`
 }
 const headers = {
   accept: '*/*',
   'accept-language': 'zh-CN,zh;q=0.9',
-  'sec-ch-ua': '"Chromium";v="140", "Not=A?Brand";v="24", "Google Chrome";v="140"',
+  'content-type': 'application/x-www-form-urlencoded',
+  priority: 'u=1, i',
   'sec-ch-ua-mobile': '?0',
-  'sec-ch-ua-platform': '"macOS"',
   'sec-fetch-dest': 'empty',
   'sec-fetch-mode': 'cors',
-  'sec-fetch-site': 'same-site',
-  Referer: 'https://stockapp.finance.qq.com/',
+  'sec-fetch-site': 'same-origin',
+  Referer: 'https://vip.stock.finance.sina.com.cn/mkt/',
 }
 
 async function main() {
-  const total = 5400
   const pList = []
-
-  for (let i = 0; i < total; i += 100) {
-    pList.push(fetch(getUrl(i), { headers }))
+  for (let i = 1; i <= 69; i++) {
+    pList.push(fetch(getUrl(i, 80), { headers }))
   }
   const resList = await Promise.all(pList)
   const result = await Promise.all(resList.map((item) => item.json()))
   const szArr = [] // 深市主板
   const shArr = [] // 沪市主板
   const zszMap = {}
-  result.forEach((_item) => {
-    _item.data.rank_list.forEach((item) => {
+  result.forEach((arr) => {
+    arr.forEach((item) => {
       const st = item.name.includes('ST')
-      const sz = item.code.startsWith('sz0') && !st
-      const sh = item.code.startsWith('sh60') && !st
+      const sz = item.symbol.startsWith('sz0') && !st
+      const sh = item.symbol.startsWith('sh60') && !st
+      const zsz = item.mktcap / 10000
       if (sz) {
-        const code = item.code.replace('sz', '') + '.SZ'
+        const code = item.symbol.replace('sz', '') + '.SZ'
         szArr.push({
           code,
           name: item.name,
         })
-        zszMap[code] = Number(item.zsz)
+        zszMap[code] = {
+          zsz,
+          name: item.name,
+        }
       } else if (sh) {
-        const code = item.code.replace('sh', '') + '.SH'
+        const code = item.symbol.replace('sh', '') + '.SH'
         shArr.push({
           code,
           name: item.name,
         })
-        zszMap[code] = Number(item.zsz)
+        zszMap[code] = {
+          zsz,
+          name: item.name,
+        }
       }
     })
   })

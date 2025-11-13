@@ -35,12 +35,10 @@ function main() {
         const code = stockItem.code
         const currData = dailyData[code]
         if (currData) {
-          const name = currData[0]
-          const fileName = `${code}_${name}`
-          if (!stockDailyMap[fileName]) {
-            stockDailyMap[fileName] = []
+          if (!stockDailyMap[code]) {
+            stockDailyMap[code] = []
           }
-          stockDailyMap[fileName].push(currData.slice(2))
+          stockDailyMap[code].push(currData.slice(2))
         } else {
           // 停牌
         }

@@ -1,3 +1,7 @@
+const path = require('node:path')
+
+const { DAILY_DIR } = require('./config')
+
 /**
  * 计算指数移动平均线（EMA）
  * @param {Array} data - 价格数据数组
@@ -154,11 +158,11 @@ function calcBBI(dailyData) {
   if (!dailyData || dailyData.length < 24) {
     return []
   }
-  
+
   // 从日线数据中提取收盘价
   const closes = dailyData.map((item) => item[4])
   const bbi = []
-  
+
   // 计算不同周期的简单移动平均线并计算BBI
   for (let i = 23; i < closes.length; i++) {
     // 计算MA3
@@ -169,11 +173,43 @@ function calcBBI(dailyData) {
     const ma12 = closes.slice(i - 11, i + 1).reduce((sum, price) => sum + price, 0) / 12
     // 计算MA24
     const ma24 = closes.slice(i - 23, i + 1).reduce((sum, price) => sum + price, 0) / 24
-    
+
     // 计算BBI
     bbi.push((ma3 + ma6 + ma12 + ma24) / 4)
   }
-  
+
   return bbi
 }
 exports.calcBBI = calcBBI
+
+/**
+ * 计算个股波动率
+ * 通过波动率计算持股仓位大小
+ * @param {string} code
+ * @returns
+ */
+function getStockPos(code) {
+  const data = require(path.join(DAILY_DIR, `${code}.json`))
+  const trList = []
+  if (data.length < 21) {
+    console.log('no len', code, data.length)
+    return 0
+  }
+  data.slice(-20).forEach((item, index) => {
+    const prevData = data[data.length - 21 + index]
+    const currHigh = item[2]
+    const currLow = item[3]
+    const prevClose = prevData[4]
+    const a = currHigh - currLow
+    const b = currHigh - prevClose
+    const c = prevClose - currLow
+    const tr = Math.max(a, b, c)
+    trList.push(tr)
+  })
+  const atr = trList.reduce((acc, cur) => acc + cur, 0) / trList.length
+  const currClose = data[data.length - 1][4]
+  // 100w账户波动为0.5%
+  const result = (100 * 0.005) / (atr / currClose)
+  return +result.toFixed(2)
+}
+exports.getStockPos = getStockPos

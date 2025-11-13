@@ -13,6 +13,7 @@ const dateList = [
   '20251110',
   '20251111',
   '20251112',
+  '20251113',
 ]
 
 function main() {
@@ -27,7 +28,11 @@ function main() {
 
     arr.forEach((item) => {
       const code = item[1]
-      const zsz = zszMap[code]
+      if (!zszMap[code]) {
+        console.log('no zsz', code)
+        return
+      }
+      const zsz = zszMap[code].zsz
       if (zsz < 100) {
         miniStocks.push(item)
       } else if (zsz < 500) {

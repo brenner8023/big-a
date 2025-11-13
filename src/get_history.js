@@ -69,10 +69,6 @@ async function main() {
   }
   Object.keys(dailyDataMap).forEach((tradeDate) => {
     const cacheFile = path.join(CACHE_DIR, `./${tradeDate}.json`)
-    if (fs.existsSync(cacheFile)) {
-      console.log('缓存已存在', cacheFile)
-      return
-    }
     fs.writeFileSync(cacheFile, JSON.stringify(dailyDataMap[tradeDate], null, 2))
   })
 }
