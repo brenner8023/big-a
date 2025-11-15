@@ -2,7 +2,7 @@ const fs = require('node:fs')
 const path = require('node:path')
 
 const { DAILY_DIR, CODE_DIR } = require('./config')
-const { calcKDJ, getSlope, getStockPos, calcMa } = require('./tools')
+const { getStockPos, calcMa } = require('./tools')
 
 fs.readdir(DAILY_DIR, (err, files) => {
   if (err) throw err
