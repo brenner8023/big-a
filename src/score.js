@@ -33,6 +33,11 @@ function main() {
       vol10 += volume
     })
     vol10 = vol10 / 10
+    const prevPrice = [
+      dailyData[dailyData.length - 2][3], // 昨日的最低价
+      dailyData[dailyData.length - 3][4], // 前日的收盘价
+    ]
+    const didi = currClose < prevPrice[0] && currClose < prevPrice[1]
 
     const { dif, dea } = calcMACD(dailyData)
     const bbi = calcBBI(dailyData)
@@ -41,12 +46,13 @@ function main() {
       volCount > 0 ? 1 : 0, // 5天内是否红肥绿瘦
       maxGreenVol > 1.1 * vol10 ? 0 : 1, // 5天内是否有放巨量的阴线
       currClose >= bbi[bbi.length - 1] ? 1 : 0, // 收盘价是否在BBI上方
+      didi ? 0 : 1, // 收盘价同时小于昨日最低价和前日收盘价
       isMACDDead(dif, dea) ? 0 : 1, // MACD是否死叉
     ]
     const score = rules.reduce((total, curr) => total + curr, 0)
     const pos = getStockPos(code)
     const name = zszMap[code].name
-    result.push({ id: `${code}_${name}`, score, rules, pos })
+    result.push({ id: name, score, rules, pos })
   })
   result.sort((a, b) => b.score - a.score)
   console.log('100w账户，账户波动0.5%为例')
