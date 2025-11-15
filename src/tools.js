@@ -192,7 +192,7 @@ function getStockPos(code) {
   const data = require(path.join(DAILY_DIR, `${code}.json`))
   const trList = []
   if (data.length < 21) {
-    console.log('no len', code, data.length)
+    // console.log('getStockPos:', code, data.length)
     return 0
   }
   data.slice(-20).forEach((item, index) => {
@@ -213,3 +213,26 @@ function getStockPos(code) {
   return +result.toFixed(2)
 }
 exports.getStockPos = getStockPos
+
+/**
+ * 计算简单移动平均线（MA）
+ * @param {Array} data - 个股数据数组
+ * @param {number} period - 移动平均线周期
+ * @returns {Array} MA数组
+ */
+function calcMa(data, period, onlyLast = true) {
+  if (!data || data.length < period) {
+    return []
+  }
+  const closes = data.map((item) => item[4])
+  if (onlyLast) {
+    const val = closes.slice(-period).reduce((sum, price) => sum + price, 0) / period
+    return [val]
+  }
+  const ma = []
+  for (let i = period - 1; i < closes.length; i++) {
+    ma.push(closes.slice(i - period + 1, i + 1).reduce((sum, price) => sum + price, 0) / period)
+  }
+  return ma
+}
+exports.calcMa = calcMa

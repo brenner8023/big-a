@@ -39,7 +39,7 @@ fs.readdir(DAILY_DIR, (err, files) => {
     const { J } = calcKDJ(data, 9)
     const flag1 = maxVols.every((i) => i.pct_chg > 0)
     const flag2 = redCount > 1.2 * greenCount
-    const flag3 = data[data.length - 1][5] >= 4
+    const flag3 = data[data.length - 1][5] > 3.9
     const flag4 = zszMap[code].zsz > 50
     const flag = flag1 && flag2 && flag3 && flag4 && J <= 55
     if (flag) {

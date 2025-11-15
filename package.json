@@ -10,6 +10,7 @@
     "score": "node src/score.js && pnpm analysis",
     "vol": "node src/vol.js",
     "b2": "node src/b2.js",
+    "didi": "node src/didi.js",
     "analysis": "node src/analysis.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
