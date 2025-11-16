@@ -29,8 +29,8 @@ fs.readdir(DAILY_DIR, (err, files) => {
     const prevLow = data[data.length - 2][3]
     const wash =
       prev_prev_pct_chg > 3.9 &&
-      prev_pct_chg <= 0 &&
-      curr_pct_chg <= 0 &&
+      prev_pct_chg < 1 &&
+      curr_pct_chg < 1 &&
       prev_vol < 0.75 * prev_prev_vol &&
       curr_vol < 0.75 * prev_prev_vol
     const didi = currClose >= prevLow
