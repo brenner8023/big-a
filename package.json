@@ -7,10 +7,11 @@
     "sc": "node src/get_code.js",
     "history": "node src/get_history.js",
     "daily": "node src/format_daily.js",
-    "score": "node src/score.js && pnpm analysis",
+    "score": "pnpm analysis && pnpm etf && node src/score.js",
     "vol": "node src/vol.js",
     "b2": "node src/b2.js",
     "didi": "node src/didi.js",
+    "etf": "node src/etf.js",
     "analysis": "node src/analysis.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

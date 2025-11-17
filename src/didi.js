@@ -19,6 +19,11 @@ fs.readdir(DAILY_DIR, (err, files) => {
     if (ma13 <= ma60) {
       return
     }
+    let vol10 = 0
+    data.slice(-10).forEach((item) => {
+      vol10 += item[6]
+    })
+    vol10 = vol10 / 10
     const curr_pct_chg = data[data.length - 1][5]
     const curr_vol = data[data.length - 1][6]
     const prev_pct_chg = data[data.length - 2][5]
@@ -28,6 +33,7 @@ fs.readdir(DAILY_DIR, (err, files) => {
     const currClose = data[data.length - 1][4]
     const prevLow = data[data.length - 2][3]
     const wash =
+      prev_prev_vol > 1.4 * vol10 &&
       prev_prev_pct_chg > 3.9 &&
       prev_pct_chg < 1 &&
       curr_pct_chg < 1 &&
