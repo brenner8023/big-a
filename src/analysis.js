@@ -14,6 +14,9 @@ const dateList = [
   '20251111',
   '20251112',
   '20251113',
+  '20251114',
+  '20251117',
+  '20251118',
 ]
 
 function main() {
@@ -63,7 +66,8 @@ function main() {
   console.log(result)
   const vals = Object.values(result)
   const getTotal = (key) => {
-    return vals.reduce((acc, cur) => acc + acc * cur[key], 1).toFixed(2)
+    const last = vals.reduce((acc, cur) => acc + (acc * cur[key]) / 100, 1)
+    return ((last - 1) * 100).toFixed(2)
   }
   console.log('月初至今：', {
     总体: getTotal('总体'),

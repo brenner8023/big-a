@@ -2,6 +2,25 @@ const path = require('node:path')
 
 const { DAILY_DIR } = require('./config')
 
+function getDidi(dailyData) {
+  const currClose = dailyData[dailyData.length - 1][4]
+  const prevPrice = [
+    dailyData[dailyData.length - 2][3], // 昨日的最低价
+    dailyData[dailyData.length - 3][4], // 前日的收盘价
+  ]
+  const didi = currClose < prevPrice[0] && currClose < prevPrice[1]
+  return didi
+}
+exports.getDidi = getDidi
+
+function getChangePercent(dailyData) {
+  const currClose = dailyData[dailyData.length - 1][4]
+  const prev120Close = dailyData[dailyData.length - 120][4]
+  const changePercent = ((currClose - prev120Close) / prev120Close) * 100
+  return +changePercent.toFixed(2)
+}
+exports.getChangePercent = getChangePercent
+
 /**
  * 计算指数移动平均线（EMA）
  * @param {Array} data - 价格数据数组

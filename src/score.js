@@ -1,7 +1,7 @@
 const path = require('node:path')
 
 const { DAILY_DIR, POSITIONS, CODE_DIR } = require('./config')
-const { calcMACD, calcBBI, getStockPos } = require('./tools')
+const { calcMACD, calcBBI, getStockPos, getDidi, getChangePercent } = require('./tools')
 
 const zszMap = require(path.join(CODE_DIR, './zsz.json'))
 
@@ -33,12 +33,8 @@ function main() {
       vol10 += volume
     })
     vol10 = vol10 / 10
-    const prevPrice = [
-      dailyData[dailyData.length - 2][3], // 昨日的最低价
-      dailyData[dailyData.length - 3][4], // 前日的收盘价
-    ]
-    const didi = currClose < prevPrice[0] && currClose < prevPrice[1]
 
+    const didi = getDidi(dailyData)
     const { dif, dea } = calcMACD(dailyData)
     const bbi = calcBBI(dailyData)
 
@@ -52,7 +48,8 @@ function main() {
     const score = rules.reduce((total, curr) => total + curr, 0)
     const pos = getStockPos(code)
     const name = zszMap[code].name
-    result.push({ id: name, score, rules, pos })
+    const cp = getChangePercent(dailyData)
+    result.push({ id: name, score, rules: rules.join(','), pos, cp })
   })
   result.sort((a, b) => b.score - a.score)
   console.log('100w账户，账户波动0.5%为例')

@@ -206,6 +206,13 @@ async function getData(etfCodes) {
   }
 }
 
+function getChangePercent(values) {
+  const currClose = values[values.length - 1]
+  const prev120Close = values[values.length - 120]
+  const changePercent = ((currClose - prev120Close) / prev120Close) * 100
+  return +changePercent.toFixed(2)
+}
+
 async function main() {
   const result = []
   const offset = ETF_CODES.length
@@ -226,9 +233,10 @@ async function main() {
     ma60 = ma60 / 60
     if (J < 13 && values[values.length - 1] >= ma60) {
       etfArr.push({
-        code: data.code,
         name: data.name,
         J: +J.toFixed(2),
+        cp: getChangePercent(values),
+        id: data.code,
       })
     }
   })

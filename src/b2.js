@@ -2,7 +2,7 @@ const fs = require('node:fs')
 const path = require('node:path')
 
 const { DAILY_DIR, CODE_DIR } = require('./config')
-const { calcKDJ, getStockPos } = require('./tools')
+const { calcKDJ, getStockPos, getChangePercent } = require('./tools')
 
 fs.readdir(DAILY_DIR, (err, files) => {
   if (err) throw err
@@ -47,6 +47,7 @@ fs.readdir(DAILY_DIR, (err, files) => {
         id: `${code}_${zszMap[code].name}`,
         pos,
         rate: (redCount / greenCount).toFixed(2),
+        cp: getChangePercent(data),
       })
     }
   })
