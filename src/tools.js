@@ -257,6 +257,31 @@ function getStockPos(code) {
 }
 exports.getStockPos = getStockPos
 
+function calcBaoPrice(code) {
+  const data = require(path.join(DAILY_DIR, `${code}.json`))
+  const trList = []
+  if (data.length < 21) {
+    // console.log('getStockPos:', code, data.length)
+    return 0
+  }
+  data.slice(-20).forEach((item, index) => {
+    const prevData = data[data.length - 21 + index]
+    const currHigh = item[2]
+    const currLow = item[3]
+    const prevClose = prevData[4]
+    const a = currHigh - currLow
+    const b = currHigh - prevClose
+    const c = prevClose - currLow
+    const tr = Math.max(a, b, c)
+    trList.push(tr)
+  })
+  const atr = trList.reduce((acc, cur) => acc + cur, 0) / trList.length
+  const currHigh = data[data.length - 1][2]
+  const result = +((2 * atr) / currHigh).toFixed(2)
+  return result
+}
+exports.calcBaoPrice = calcBaoPrice
+
 /**
  * 计算简单移动平均线（MA）
  * @param {Array} data - 个股数据数组

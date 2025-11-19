@@ -1,7 +1,7 @@
 const path = require('node:path')
 
 const { DAILY_DIR, POSITIONS, CODE_DIR } = require('./config')
-const { calcMACD, calcBBI, getStockPos, getDidi, getMaxPercent } = require('./tools')
+const { calcMACD, calcBBI, getDidi, getMaxPercent, calcBaoPrice } = require('./tools')
 
 const zszMap = require(path.join(CODE_DIR, './zsz.json'))
 
@@ -46,13 +46,12 @@ function main() {
       isMACDDead(dif, dea) ? 0 : 1, // MACD是否死叉
     ]
     const score = rules.reduce((total, curr) => total + curr, 0)
-    const pos = getStockPos(code)
+    const bao = calcBaoPrice(code)
     const name = zszMap[code].name
     const cp = +getMaxPercent(dailyData)
-    result.push({ id: name, score, rules: rules.join(','), pos, cp })
+    result.push({ id: name, score, rules: rules.join(','), bao, cp })
   })
   result.sort((a, b) => b.score - a.score)
-  console.log('100w账户，账户波动0.5%为例')
   console.log(result)
 }
 main()
