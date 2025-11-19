@@ -1,7 +1,7 @@
 const path = require('node:path')
 
 const { DAILY_DIR, POSITIONS, CODE_DIR } = require('./config')
-const { calcMACD, calcBBI, getStockPos, getDidi, getChangePercent } = require('./tools')
+const { calcMACD, calcBBI, getStockPos, getDidi, getMaxPercent } = require('./tools')
 
 const zszMap = require(path.join(CODE_DIR, './zsz.json'))
 
@@ -39,16 +39,16 @@ function main() {
     const bbi = calcBBI(dailyData)
 
     const rules = [
+      didi ? 0 : 1, // 收盘价同时小于昨日最低价和前日收盘价
       volCount > 0 ? 1 : 0, // 5天内是否红肥绿瘦
       maxGreenVol > 1.1 * vol10 ? 0 : 1, // 5天内是否有放巨量的阴线
       currClose >= bbi[bbi.length - 1] ? 1 : 0, // 收盘价是否在BBI上方
-      didi ? 0 : 1, // 收盘价同时小于昨日最低价和前日收盘价
       isMACDDead(dif, dea) ? 0 : 1, // MACD是否死叉
     ]
     const score = rules.reduce((total, curr) => total + curr, 0)
     const pos = getStockPos(code)
     const name = zszMap[code].name
-    const cp = getChangePercent(dailyData)
+    const cp = +getMaxPercent(dailyData)
     result.push({ id: name, score, rules: rules.join(','), pos, cp })
   })
   result.sort((a, b) => b.score - a.score)

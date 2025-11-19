@@ -2,7 +2,7 @@ const fs = require('node:fs')
 const path = require('node:path')
 
 const { DAILY_DIR, CODE_DIR } = require('./config')
-const { calcKDJ, getSlope, getStockPos, getDidi, getChangePercent } = require('./tools')
+const { calcKDJ, getSlope, getStockPos, getDidi, getMaxPercent } = require('./tools')
 
 fs.readdir(DAILY_DIR, (err, files) => {
   if (err) throw err
@@ -39,18 +39,20 @@ fs.readdir(DAILY_DIR, (err, files) => {
     const slope = getSlope(data, 5).toFixed(4)
     const pos = getStockPos(code)
     const { J } = calcKDJ(data, 9)
+    const cp = +getMaxPercent(data)
     const flag1 = maxVols.every((i) => i.pct_chg > 0)
     const flag2 = redCount > 1.6 * greenCount
     const flag3 = (slope < 0.15 && slope > -0.15) || !getDidi(data)
     const flag4 = zszMap[code].zsz > 50
     const flag5 = pos > 9.5 && pos < 33
-    const flag = flag1 && flag2 && flag3 && flag4 && flag5 && J <= 13
+    const flag6 = cp > 10 && J <= 13
+    const flag = flag1 && flag2 && flag3 && flag4 && flag5 && flag6
     if (flag) {
       result.push({
         id: `${code}_${name}`,
         pos,
         rate: (redCount / greenCount).toFixed(2),
-        cp: getChangePercent(data),
+        cp,
       })
     }
   })

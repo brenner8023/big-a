@@ -15,11 +15,35 @@ exports.getDidi = getDidi
 
 function getChangePercent(dailyData) {
   const currClose = dailyData[dailyData.length - 1][4]
-  const prev120Close = dailyData[dailyData.length - 120][4]
+  const prev120Close = dailyData[dailyData.length - 120 > 0 ? dailyData.length - 120 : 0][4]
   const changePercent = ((currClose - prev120Close) / prev120Close) * 100
   return +changePercent.toFixed(2)
 }
 exports.getChangePercent = getChangePercent
+
+// 计算个股历史走势强度
+function getMaxPercent(dailyData) {
+  const result = []
+  const ma5List = calcMa(dailyData, 3, false)
+  for (let i = 1; i < ma5List.length; i++) {
+    let startIndex = -1
+    while (i < ma5List.length - 1 && ma5List[i + 1] > ma5List[i]) {
+      if (startIndex === -1) {
+        startIndex = i
+      }
+      i++
+    }
+    const endIndex = i
+    if (startIndex > -1 && endIndex > startIndex) {
+      const ma5Start = ma5List[startIndex]
+      const ma5End = ma5List[endIndex]
+      const changePercent = ((ma5End - ma5Start) / ma5Start) * 100
+      result.push(changePercent)
+    }
+  }
+  return Math.max(...result).toFixed(2) || 0
+}
+exports.getMaxPercent = getMaxPercent
 
 /**
  * 计算指数移动平均线（EMA）
