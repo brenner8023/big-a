@@ -206,13 +206,6 @@ async function getData(etfCodes) {
   }
 }
 
-function getChangePercent(values) {
-  const currClose = values[values.length - 1]
-  const prev120Close = values[values.length - 120]
-  const changePercent = ((currClose - prev120Close) / prev120Close) * 100
-  return +changePercent.toFixed(2)
-}
-
 async function main() {
   const result = []
   const offset = ETF_CODES.length

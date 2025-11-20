@@ -1,7 +1,7 @@
 const path = require('node:path')
 
 const { DAILY_DIR, POSITIONS, CODE_DIR } = require('./config')
-const { calcMACD, calcBBI, getDidi, getMaxPercent, calcBaoPrice } = require('./tools')
+const { calcMACD, calcBBI, getDidi, calcStockStrength, calcBaoPrice } = require('./tools')
 
 const zszMap = require(path.join(CODE_DIR, './zsz.json'))
 
@@ -48,8 +48,8 @@ function main() {
     const score = rules.reduce((total, curr) => total + curr, 0)
     const bao = calcBaoPrice(code)
     const name = zszMap[code].name
-    const cp = +getMaxPercent(dailyData)
-    result.push({ id: name, score, rules: rules.join(','), bao, cp })
+    const ss = +calcStockStrength(dailyData)
+    result.push({ id: name, score, rules: rules.join(','), bao, ss })
   })
   result.sort((a, b) => b.score - a.score)
   console.log(result)

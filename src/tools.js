@@ -1,6 +1,6 @@
 const path = require('node:path')
 
-const { DAILY_DIR } = require('./config')
+const { DAILY_DIR, BULL_MARKET_DIR } = require('./config')
 
 function getDidi(dailyData) {
   const currClose = dailyData[dailyData.length - 1][4]
@@ -13,37 +13,30 @@ function getDidi(dailyData) {
 }
 exports.getDidi = getDidi
 
-function getChangePercent(dailyData) {
-  const currClose = dailyData[dailyData.length - 1][4]
-  const prev120Close = dailyData[dailyData.length - 120 > 0 ? dailyData.length - 120 : 0][4]
-  const changePercent = ((currClose - prev120Close) / prev120Close) * 100
-  return +changePercent.toFixed(2)
-}
-exports.getChangePercent = getChangePercent
+/**
+ * 牛市起止日期
+ * 20140701-20150601
+ * 20190103-20210901
+ */
+exports.calcStockStrength = function (code) {
+  const startData1 = require('../bull_market/20140701.json')
+  const endData1 = require('../bull_market/20150601.json')
+  const startData2 = require('../bull_market/20190103.json')
+  const endData2 = require('../bull_market/20210901.json')
 
-// 计算个股历史走势强度
-function getMaxPercent(dailyData) {
-  const result = []
-  const ma5List = calcMa(dailyData, 3, false)
-  for (let i = 1; i < ma5List.length; i++) {
-    let startIndex = -1
-    while (i < ma5List.length - 1 && ma5List[i + 1] > ma5List[i]) {
-      if (startIndex === -1) {
-        startIndex = i
-      }
-      i++
-    }
-    const endIndex = i
-    if (startIndex > -1 && endIndex > startIndex) {
-      const ma5Start = ma5List[startIndex]
-      const ma5End = ma5List[endIndex]
-      const changePercent = ((ma5End - ma5Start) / ma5Start) * 100
-      result.push(changePercent)
-    }
+  const startClose1 = startData1[code] ? startData1[code][6] : 1
+  const endClose1 = endData1[code] ? endData1[code][6] : 1
+  const startClose2 = startData2[code] ? startData2[code][6] : 1
+  const endClose2 = endData2[code] ? endData2[code][6] : 1
+
+  const val1 = (endClose1 - startClose1) / startClose1
+  const val2 = (endClose2 - startClose2) / startClose2
+
+  if (val1 === 0 || val2 === 0) {
+    return 1
   }
-  return Math.max(...result).toFixed(2) || 0
+  return +((val1 + val2) / 2).toFixed(2)
 }
-exports.getMaxPercent = getMaxPercent
 
 /**
  * 计算指数移动平均线（EMA）
