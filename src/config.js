@@ -13,20 +13,13 @@ const CODE_DIR = path.join(root, './code')
 exports.CODE_DIR = CODE_DIR
 
 exports.UPDATE_CONFIG = {
-  start: '20251001',
-  end: '20251201',
+  start: '20251121',
+  end: '20251121',
 }
 
 exports.POSITIONS = [
   '600036.SH', // 招商银行
-  '002548.SZ', // 金新农
-  '603225.SH', // 新凤鸣
-  '603998.SH', // 方盛制药
-  '601319.SH', // 中国人保
-  '002961.SZ', // 瑞达期货
-  '600026.SH', // 中远海能
-  '002533.SZ', // 金杯电工
-  '600686.SH', // 金龙汽车
+  '002279.SZ', // 久其软件
 ]
 
 exports.WORKDAYS = {

@@ -7,7 +7,7 @@
     "sc": "node src/get_code.js",
     "history": "node src/get_history.js",
     "daily": "node src/format_daily.js",
-    "score": "pnpm analysis && pnpm etf && node src/score.js",
+    "score": "pnpm analysis && node src/score.js",
     "vol": "node src/vol.js",
     "b2": "node src/b2.js",
     "didi": "node src/didi.js",

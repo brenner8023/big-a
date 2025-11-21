@@ -2,7 +2,7 @@ const fs = require('node:fs')
 const path = require('node:path')
 
 const { DAILY_DIR, CODE_DIR } = require('./config')
-const { calcKDJ, getStockPos, calcStockStrength } = require('./tools')
+const { calcKDJ, getStockPos } = require('./tools')
 
 fs.readdir(DAILY_DIR, (err, files) => {
   if (err) throw err
@@ -37,7 +37,6 @@ fs.readdir(DAILY_DIR, (err, files) => {
     const code = file.replace('.json', '')
     const pos = getStockPos(code)
     const { J } = calcKDJ(data, 9)
-    const ss = calcStockStrength(data)
     const flag1 = maxVols.every((i) => i.pct_chg > 0)
     const flag2 = redCount > 1.2 * greenCount
     const flag3 = data[data.length - 1][5] > 3.9
@@ -48,7 +47,6 @@ fs.readdir(DAILY_DIR, (err, files) => {
         id: `${code}_${zszMap[code].name}`,
         pos,
         rate: (redCount / greenCount).toFixed(2),
-        ss,
       })
     }
   })

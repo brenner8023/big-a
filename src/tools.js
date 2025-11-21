@@ -1,6 +1,6 @@
 const path = require('node:path')
 
-const { DAILY_DIR, BULL_MARKET_DIR } = require('./config')
+const { DAILY_DIR } = require('./config')
 
 function getDidi(dailyData) {
   const currClose = dailyData[dailyData.length - 1][4]
@@ -12,83 +12,6 @@ function getDidi(dailyData) {
   return didi
 }
 exports.getDidi = getDidi
-
-/**
- * 牛市起止日期
- * 20140701-20150601
- * 20190103-20210901
- */
-exports.calcStockStrength = function (code) {
-  const startData1 = require('../bull_market/20140701.json')
-  const endData1 = require('../bull_market/20150601.json')
-  const startData2 = require('../bull_market/20190103.json')
-  const endData2 = require('../bull_market/20210901.json')
-
-  const startClose1 = startData1[code] ? startData1[code][6] : 1
-  const endClose1 = endData1[code] ? endData1[code][6] : 1
-  const startClose2 = startData2[code] ? startData2[code][6] : 1
-  const endClose2 = endData2[code] ? endData2[code][6] : 1
-
-  const val1 = (endClose1 - startClose1) / startClose1
-  const val2 = (endClose2 - startClose2) / startClose2
-
-  if (val1 === 0 || val2 === 0) {
-    return 1
-  }
-  return +((val1 + val2) / 2).toFixed(2)
-}
-
-/**
- * 计算指数移动平均线（EMA）
- * @param {Array} data - 价格数据数组
- * @param {number} period - 周期
- * @returns {Array} EMA数组
- */
-function calculateEMA(data, period) {
-  const k = 2 / (period + 1)
-  const ema = []
-
-  // 第一个EMA值使用简单平均值
-  let sum = 0
-  for (let i = 0; i < period; i++) {
-    sum += data[i]
-  }
-  ema[period - 1] = sum / period
-
-  // 计算后续EMA值
-  for (let i = period; i < data.length; i++) {
-    ema[i] = data[i] * k + ema[i - 1] * (1 - k)
-  }
-
-  return ema
-}
-
-/**
- * 计算MACD指标
- * @param {Array} dailyData - 日线数据数组
- * @returns {Object} 包含dif和dea的对象
- */
-function calcMACD(dailyData) {
-  // 从日线数据中提取收盘价
-  const closes = dailyData.map((item) => item[4])
-
-  // 计算EMA12和EMA26
-  const ema12 = calculateEMA(closes, 12)
-  const ema26 = calculateEMA(closes, 26)
-
-  // 计算DIF线
-  const dif = []
-  for (let i = 25; i < closes.length; i++) {
-    // EMA26从第26个数据点开始有效
-    dif.push(ema12[i] - ema26[i])
-  }
-
-  // 计算DEA线（DIF的9日EMA）
-  const dea = calculateEMA(dif, 9)
-
-  return { dif, dea }
-}
-exports.calcMACD = calcMACD
 
 /**
  * 计算KDJ指标
@@ -249,31 +172,6 @@ function getStockPos(code) {
   return +result.toFixed(2)
 }
 exports.getStockPos = getStockPos
-
-function calcBaoPrice(code) {
-  const data = require(path.join(DAILY_DIR, `${code}.json`))
-  const trList = []
-  if (data.length < 21) {
-    // console.log('getStockPos:', code, data.length)
-    return 0
-  }
-  data.slice(-20).forEach((item, index) => {
-    const prevData = data[data.length - 21 + index]
-    const currHigh = item[2]
-    const currLow = item[3]
-    const prevClose = prevData[4]
-    const a = currHigh - currLow
-    const b = currHigh - prevClose
-    const c = prevClose - currLow
-    const tr = Math.max(a, b, c)
-    trList.push(tr)
-  })
-  const atr = trList.reduce((acc, cur) => acc + cur, 0) / trList.length
-  const currHigh = data[data.length - 1][2]
-  const result = +((2 * atr) / currHigh).toFixed(2)
-  return result
-}
-exports.calcBaoPrice = calcBaoPrice
 
 /**
  * 计算简单移动平均线（MA）
