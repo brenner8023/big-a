@@ -12,6 +12,8 @@ exports.DAILY_DIR = path.join(root, './daily')
 const CODE_DIR = path.join(root, './code')
 exports.CODE_DIR = CODE_DIR
 
+exports.APP_DIR = path.join(root, './app')
+
 exports.UPDATE_CONFIG = {
   start: '20251121',
   end: '20251121',

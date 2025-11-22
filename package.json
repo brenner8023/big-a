@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "vite",
     "sc": "node src/get_code.js",
     "history": "node src/get_history.js",
     "daily": "node src/format_daily.js",
@@ -18,5 +19,14 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.19.0"
+  "packageManager": "pnpm@10.19.0",
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.2",
+    "vite": "^7.2.4",
+    "vite-plugin-vue-devtools": "^8.0.5"
+  },
+  "dependencies": {
+    "echarts": "^6.0.0",
+    "vue": "^3.5.24"
+  }
 }
