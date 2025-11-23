@@ -1,7 +1,3 @@
-const path = require('node:path')
-
-const { DAILY_DIR } = require('./config')
-
 function getDidi(dailyData) {
   const currClose = dailyData[dailyData.length - 1][4]
   const prevPrice = [
@@ -147,8 +143,7 @@ exports.calcBBI = calcBBI
  * @param {string} code
  * @returns
  */
-function getStockPos(code) {
-  const data = require(path.join(DAILY_DIR, `${code}.json`))
+function getStockPos(data) {
   const trList = []
   if (data.length < 21) {
     // console.log('getStockPos:', code, data.length)

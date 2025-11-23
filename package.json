@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "vite",
     "sc": "node src/get_code.js",
+    "cyb": "node src/cyb_get_history.js",
     "history": "node src/get_history.js",
-    "daily": "node src/format_daily.js",
+    "daily": "node src/format_daily.js && node src/cyb_format_daily.js",
     "score": "pnpm analysis && node src/score.js",
     "vol": "node src/vol.js",
     "b2": "node src/b2.js",

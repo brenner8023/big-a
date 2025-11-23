@@ -27,9 +27,9 @@ export function getStockPrices(type) {
   const result = [
     [
       1, // open
-      1, // high
-      1, // low
       1, // close
+      1, // low
+      1, // high
     ],
   ]
   data.forEach((item, index) => {

@@ -8,9 +8,10 @@ const path = require('node:path')
 
 const { CODE_DIR } = require('./config')
 
-const getUrl = (page, count) => {
-  return `https://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=${page}&num=${count}&sort=changepercent&asc=0&node=hs_a&symbol=&_s_r_a=page`
+const getUrl = (page, count, node = 'hs_a') => {
+  return `https://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=${page}&num=${count}&sort=symbol&asc=1&node=${node}&symbol=&_s_r_a=page`
 }
+
 const headers = {
   accept: '*/*',
   'accept-language': 'zh-CN,zh;q=0.9',
@@ -32,33 +33,41 @@ async function main() {
   const result = await Promise.all(resList.map((item) => item.json()))
   const szArr = [] // 深市主板
   const shArr = [] // 沪市主板
+  const chiNextArr = [] // 创业板
   const zszMap = {}
   result.forEach((arr) => {
     arr.forEach((item) => {
       const st = item.name.includes('ST')
       const sz = item.symbol.startsWith('sz0') && !st
       const sh = item.symbol.startsWith('sh60') && !st
-      const zsz = item.mktcap / 10000
+      const isChiNext = item.symbol.startsWith('sz30') && !st
+      const code = isChiNext
+        ? item.symbol.replace('sz', '') + '.SZ'
+        : sh
+        ? item.symbol.replace('sh', '') + '.SH'
+        : item.symbol.replace('sz', '') + '.SZ'
+      if (sz || sh || isChiNext) {
+        const zsz = item.mktcap / 10000
+        zszMap[code] = {
+          zsz,
+          name: item.name,
+        }
+      }
       if (sz) {
-        const code = item.symbol.replace('sz', '') + '.SZ'
         szArr.push({
           code,
           name: item.name,
         })
-        zszMap[code] = {
-          zsz,
-          name: item.name,
-        }
       } else if (sh) {
-        const code = item.symbol.replace('sh', '') + '.SH'
         shArr.push({
           code,
           name: item.name,
         })
-        zszMap[code] = {
-          zsz,
+      } else if (isChiNext) {
+        chiNextArr.push({
+          code,
           name: item.name,
-        }
+        })
       }
     })
   })
@@ -67,8 +76,10 @@ async function main() {
   }
   fs.writeFileSync(path.join(CODE_DIR, 'sz.json'), JSON.stringify(szArr, null, 2))
   fs.writeFileSync(path.join(CODE_DIR, 'sh.json'), JSON.stringify(shArr, null, 2))
+  fs.writeFileSync(path.join(CODE_DIR, 'chi_next.json'), JSON.stringify(chiNextArr, null, 2))
   fs.writeFileSync(path.join(CODE_DIR, 'zsz.json'), JSON.stringify(zszMap, null, 2))
   console.log('深市主板', szArr.length)
   console.log('沪市主板', shArr.length)
+  console.log('创业板', chiNextArr.length)
 }
 main()

@@ -26,26 +26,24 @@ function main() {
     fs.mkdirSync(DAILY_DIR, { recursive: true })
   }
   const stockDailyMap = {}
-  const workdays = getWorkdays(WORKDAYS.start)
-  workdays.forEach((workday) => {
-    const cacheFile = path.join(CACHE_DIR, `./${workday}.json`)
-    if (fs.existsSync(cacheFile)) {
-      const dailyData = require(cacheFile)
-      getAllStocks().forEach((stockItem) => {
-        const code = stockItem.code
-        const currData = dailyData[code]
-        if (currData) {
-          if (!stockDailyMap[code]) {
-            stockDailyMap[code] = []
-          }
-          stockDailyMap[code].push(currData.slice(2))
-        } else {
-          // 停牌
-        }
-      })
-    } else {
-      console.log(`${workday}数据不存在`)
+  fs.readdirSync(CACHE_DIR).forEach((file) => {
+    if (!file.endsWith('.json')) {
+      return
     }
+    const cacheFile = path.join(CACHE_DIR, file)
+    const dailyData = require(cacheFile)
+    getAllStocks().forEach((stockItem) => {
+      const code = stockItem.code
+      const currData = dailyData[code]
+      if (currData) {
+        if (!stockDailyMap[code]) {
+          stockDailyMap[code] = []
+        }
+        stockDailyMap[code].push(currData.slice(2))
+      } else {
+        // 停牌
+      }
+    })
   })
   Object.keys(stockDailyMap).forEach((fileName) => {
     const stockFile = path.join(DAILY_DIR, `./${fileName}.json`)
