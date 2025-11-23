@@ -1,17 +1,13 @@
 const path = require('node:path')
 const fs = require('node:fs')
 
-const { CACHE_DIR, CODE_DIR, APP_DIR } = require('./config')
+const { CACHE_DIR, CODE_DIR, APP_DIR, CACHE_CYB_DIR } = require('./config')
 
 const zszMap = require(path.join(CODE_DIR, './zsz.json'))
 
 const getMiddleData = (arr) => {
   const mid = Math.floor(arr.length / 2)
   return arr[mid]
-}
-const getFinalChangePercent = (key, vals) => {
-  const last = vals.reduce((acc, cur) => acc + (acc * cur[key]) / 100, 1)
-  return ((last - 1) * 100).toFixed(2)
 }
 
 function main() {
@@ -22,7 +18,10 @@ function main() {
       return
     }
     const date = file.replace('.json', '')
-    const currData = require(path.join(CACHE_DIR, file))
+    const currData = {
+      ...require(path.join(CACHE_DIR, file)),
+      ...require(path.join(CACHE_CYB_DIR, file)),
+    }
 
     const arr = Object.values(currData)
     const miniStocks = []

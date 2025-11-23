@@ -4,7 +4,7 @@ const path = require('node:path')
 const { DAILY_DIR, DAILY_CYB_DIR, CODE_DIR } = require('./config')
 const { calcKDJ, getSlope, getStockPos, getDidi } = require('./tools')
 
-function selectStocks(files, dir) {
+function selectStocks(files, dir, redRatio) {
   const zszMap = require(path.join(CODE_DIR, './zsz.json'))
   const result = []
   files.forEach((file) => {
@@ -39,7 +39,7 @@ function selectStocks(files, dir) {
     const pos = getStockPos(data)
     const { J } = calcKDJ(data, 9)
     const flag1 = maxVols.every((i) => i.pct_chg > 0)
-    const flag2 = redCount > 1.6 * greenCount
+    const flag2 = redCount > redRatio * greenCount
     const flag3 = (slope < 0.15 && slope > -0.15) || !getDidi(data)
     const flag4 = zszMap[code].zsz > 50
     const flag5 = pos > 9.5 && pos < 33
@@ -61,7 +61,7 @@ function selectStocks(files, dir) {
 function main() {
   const files = fs.readdirSync(DAILY_DIR)
   const cybFiles = fs.readdirSync(DAILY_CYB_DIR)
-  selectStocks(files, DAILY_DIR)
-  selectStocks(cybFiles, DAILY_CYB_DIR)
+  selectStocks(files, DAILY_DIR, 1.6)
+  selectStocks(cybFiles, DAILY_CYB_DIR, 1.4)
 }
 main()
