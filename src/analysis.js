@@ -2,15 +2,15 @@ const path = require('node:path')
 const fs = require('node:fs')
 
 const { CACHE_DIR, CODE_DIR, APP_DIR, CACHE_CYB_DIR } = require('./config')
-
 const zszMap = require(path.join(CODE_DIR, './zsz.json'))
+const { getPriceLimit } = require('./price_limit')
 
 const getMiddleData = (arr) => {
   const mid = Math.floor(arr.length / 2)
   return arr[mid]
 }
 
-function main() {
+async function main() {
   const result = []
 
   fs.readdirSync(CACHE_DIR).forEach((file) => {
@@ -60,5 +60,6 @@ function main() {
 
   result.sort((a, b) => new Date(a.date) - new Date(b.date))
   fs.writeFileSync(path.join(APP_DIR, 'cp.json'), JSON.stringify(result, null, 2))
+  await getPriceLimit()
 }
 main()

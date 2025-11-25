@@ -4,4 +4,5 @@ daily
 token.js
 cache_cyb
 daily_cyb
+app/price_limit
 node_modules

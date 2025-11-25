@@ -17,8 +17,8 @@ exports.CODE_DIR = CODE_DIR
 exports.APP_DIR = path.join(root, './app')
 
 exports.UPDATE_CONFIG = {
-  start: '20250901',
-  end: '20251123',
+  start: '20251124',
+  end: '20251124',
 }
 
 exports.POSITIONS = [
