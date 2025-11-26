@@ -6,7 +6,7 @@ const fs = require('node:fs')
 const path = require('node:path')
 
 const { CACHE_CYB_DIR, UPDATE_CONFIG, chiNextStocks } = require('./config')
-const { TOKEN } = require('./token')
+const { TOKEN } = require('../token')
 
 const getDailyData = async (tsCode, stockMap, dailyDataMap) => {
   const body = {
