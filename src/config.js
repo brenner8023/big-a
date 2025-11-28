@@ -23,7 +23,8 @@ exports.UPDATE_CONFIG = {
 
 exports.POSITIONS = [
   '600036.SH', // 招商银行
-  '002279.SZ', // 久其软件
+  '603049.SH', // 中策橡胶
+  '002312.SZ', // 川发龙蟒
 ]
 
 exports.WORKDAYS = {
