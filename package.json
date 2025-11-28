@@ -12,7 +12,7 @@
     "score": "pnpm analysis && node src/score.js",
     "vol": "node src/vol.js",
     "b2": "node src/b2.js",
-    "didi": "node src/didi.js",
+    "bk": "node src/get_bk.js",
     "etf": "node src/etf.js",
     "analysis": "node src/analysis.js",
     "test": "echo \"Error: no test specified\" && exit 1"

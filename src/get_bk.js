@@ -1,60 +1,60 @@
 const fs = require('node:fs')
 const path = require('node:path')
 
-const { CODE_DIR, DAILY_DIR, BK_DIR } = require('./config')
-const { calcKDJ, calcMa } = require('./tools')
+const { BK_DIR, DAILY_DIR, CODE_DIR } = require('./config')
+const { calcMa, calcKDJ } = require('./tools')
 
-function getUrl(code) {
-  const timestamp = +Date.now()
-  const ut = 'bd1d9dd80304c38a843e42432f251653'
-  const fields = 'f12,f14,f100,f265'
-
-  return `https://push2delay.eastmoney.com/api/qt/clist/get?pn=1&pz=300&po=1&np=3&fid=f3&fs=b:${code}&fields=${fields}&_=${timestamp}&fltt=2&invt=2&ut=${ut}`
-}
-const headers = {
-  'content-type': 'application/json',
+const zszMap = require(path.join(CODE_DIR, './zsz.json'))
+const getDetailUrl = (code) => {
+  const time = +Date.now()
+  const cb = `get_bk_detail`
+  const fields = 'f12,f14'
+  return `https://push2.eastmoney.com/api/qt/clist/get?np=1&fltt=1&invt=2&cb=${cb}&fs=b%3A${code}%2Bf%3A!50&fields=${fields}&fid=f3&pn=1&pz=100&po=1&dect=1&ut=fa5fd1943c7b386f172d6893dbfba10b&wbp2u=%7C0%7C0%7C0%7Cweb&_=${time}`
 }
 
 async function main() {
-  const code = ''
-  if (code) {
-    const res = await fetch(getUrl(code), { headers })
-    const {
-      data: { diff },
-    } = await res.json()
-    const stockList = []
-    diff.forEach((item) => {
-      if (item.f14.includes('ST') || item.f14.startsWith('C')) {
-        return
-      }
-      if (!(item.f12.startsWith('00') || item.f12.startsWith('60'))) {
-        return
-      }
-      let code = ''
-      if (item.f12.startsWith('00')) {
-        code = item.f12 + '.SZ'
-      } else if (item.f12.startsWith('60')) {
-        code = item.f12 + '.SH'
-      }
-      stockList.push({
-        code,
-        name: item.f14,
+  const flag = false
+  if (flag) {
+    const bkList = require(path.join(BK_DIR, './bk.json'))
+    const result = {}
+    const pList = bkList.map((item) => fetch(getDetailUrl(item.code)))
+    const resList = await Promise.all(pList)
+    const textList = await Promise.all(resList.map((item) => item.text()))
+    textList.forEach((resText, index) => {
+      const {
+        data: { diff },
+      } = JSON.parse(resText.replace('get_bk_detail(', '').replace(/\);$/, ''))
+      let stockList = diff.map((item) => {
+        let code = item.f12
+        if (code.startsWith('60')) {
+          code += '.SH'
+        } else if (code.startsWith('00')) {
+          code += '.SZ'
+        }
+        return {
+          code,
+          name: item.f14,
+        }
       })
+      stockList = stockList.filter(
+        (item) => item.code.startsWith('60') || item.code.startsWith('00')
+      )
+      stockList = stockList.filter(
+        (item) => !item.name.includes('ST') && !item.name.startsWith('C')
+      )
+      if (stockList.length < 10) {
+        return
+      }
+      const bkName = bkList[index].name
+      result[bkName] = stockList
     })
-
-    const bkName = diff[0].f100
-    fs.writeFileSync(
-      path.join(BK_DIR, `${bkName}_${code}.json`),
-      JSON.stringify(stockList, null, 2)
-    )
+    fs.writeFileSync(path.join(BK_DIR, './bk_detail.json'), JSON.stringify(result, null, 2))
   }
-  const zszMap = require(path.join(CODE_DIR, './zsz.json'))
-  let bkFiles = fs.readdirSync(BK_DIR).filter((item) => item.endsWith('.json'))
+  const bkDetail = require(path.join(BK_DIR, './bk_detail.json'))
   let result = []
-  bkFiles.forEach((bkFile) => {
-    const bkStockList = require(path.join(BK_DIR, `${bkFile}`))
+  Object.keys(bkDetail).forEach((bkName) => {
     const bkResult = []
-    bkStockList.forEach((item) => {
+    bkDetail[bkName].forEach((item) => {
       const code = item.code
       const dailyData = require(path.join(DAILY_DIR, `${code}.json`))
       let redCount = 0
@@ -68,12 +68,13 @@ async function main() {
           greenCount += vol
         }
       })
+
       const ma13 = calcMa(dailyData, 13)
       const ma60 = calcMa(dailyData, 60)
       const { J } = calcKDJ(dailyData, 9)
       const zsz = zszMap[code].zsz
       const rate = +(redCount / greenCount).toFixed(2)
-      if (J <= 55 && zsz > 50 && rate > 1 && ma13 > ma60) {
+      if (J < 56 && zsz > 50 && rate > 1 && ma13 > ma60) {
         bkResult.push({
           code,
           name: item.name,
@@ -84,12 +85,11 @@ async function main() {
     })
     bkResult.sort((a, b) => b.rate - a.rate)
     result.push({
-      bkName: bkFile,
+      bkName,
       stocks: bkResult,
     })
   })
-  result = result.filter((item) => item.stocks.length > 10)
-  result = result.sort((a, b) => b.stocks.length - a.stocks.length)
-  fs.writeFileSync('bk.json', JSON.stringify(result, null, 2))
+  result = result.filter((item) => item.stocks.length > 0.5 * bkDetail[item.bkName].length)
+  fs.writeFileSync('./_bk.json', JSON.stringify(result, null, 2))
 }
 main()
