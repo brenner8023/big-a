@@ -43,8 +43,8 @@ function selectStocks(files, dir, redRatio) {
     const flag1 = maxVols.every((i) => i.pct_chg > 0)
     const flag2 = redCount > redRatio * greenCount
     const flag3 = (slope < 0.15 && slope > -0.15) || !getDidi(data)
-    const flag4 = zszMap[code].zsz > 50 && ma13 > ma60
-    const flag5 = pos > 9.5 && pos < 33
+    const flag4 = zszMap[code].zsz > 30 && ma13 > ma60
+    const flag5 = pos > 8 && pos < 40
     const flag6 = J <= 13
     const flag = flag1 && flag2 && flag3 && flag4 && flag5 && flag6
     if (flag) {
@@ -63,7 +63,7 @@ function selectStocks(files, dir, redRatio) {
 function main() {
   const files = fs.readdirSync(DAILY_DIR)
   const cybFiles = fs.readdirSync(DAILY_CYB_DIR)
-  selectStocks(files, DAILY_DIR, 1.6)
+  selectStocks(files, DAILY_DIR, 1.3)
   selectStocks(cybFiles, DAILY_CYB_DIR, 1.5)
 }
 main()

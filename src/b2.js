@@ -39,7 +39,7 @@ function selectStocks(files, dir) {
     const flag1 = maxVols.every((i) => i.pct_chg > 0)
     const flag2 = redCount > 1.2 * greenCount
     const flag3 = data[data.length - 1][5] > 3.9
-    const flag4 = zszMap[code].zsz > 50
+    const flag4 = zszMap[code].zsz > 30
     const flag = flag1 && flag2 && flag3 && flag4 && J <= 55
     if (flag) {
       result.push({

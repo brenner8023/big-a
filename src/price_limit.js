@@ -6,17 +6,17 @@ exports.getPriceLimit = async function () {
     'content-type': 'application/json',
   }
   const dateMap = {
-    20251117: 20251117,
-    20251118: 20251118,
-    20251119: 20251119,
     20251120: 20251120,
     20251121: 20251121,
-
     20251124: 20251124,
     20251125: 20251125,
     20251126: 20251126,
+
     20251127: 20251127,
     20251128: 20251128,
+    20251201: 20251201,
+    20251202: 20251202,
+    20251203: 20251203,
   }
   const dateArr = Object.keys(dateMap)
   const resList = await Promise.all(dateArr.map((date) => fetch(getUrl(date), { headers })))

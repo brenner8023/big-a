@@ -15,7 +15,7 @@ exports.getDidi = getDidi
  * @param {number} period - 计算周期
  * @returns {Object} 包含K、D、J值的对象
  */
-function calcKDJ(data, period) {
+exports.calcKDJ = function (data, period) {
   if (!data || data.length < period) {
     return { K: 50, D: 50, J: 50 }
   }
@@ -64,7 +64,6 @@ function calcKDJ(data, period) {
     J: J[J.length - 1],
   }
 }
-exports.calcKDJ = calcKDJ
 
 /**
  * 计算K线斜率
