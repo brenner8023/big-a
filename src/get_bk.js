@@ -9,7 +9,8 @@ const getDetailUrl = (code) => {
   const time = +Date.now()
   const cb = `get_bk_detail`
   const fields = 'f12,f14'
-  return `https://push2.eastmoney.com/api/qt/clist/get?np=1&fltt=1&invt=2&cb=${cb}&fs=b%3A${code}%2Bf%3A!50&fields=${fields}&fid=f3&pn=1&pz=100&po=1&dect=1&ut=fa5fd1943c7b386f172d6893dbfba10b&wbp2u=%7C0%7C0%7C0%7Cweb&_=${time}`
+  const ut = 'fa5fd1943c7b386f172d6893dbfba10b'
+  return `https://push2.eastmoney.com/api/qt/clist/get?np=1&fltt=1&invt=2&cb=${cb}&fs=b%3A${code}%2Bf%3A!50&fields=${fields}&fid=f3&pn=1&pz=100&po=1&dect=1&ut=${ut}&wbp2u=%7C0%7C0%7C0%7Cweb&_=${time}`
 }
 
 async function main() {
@@ -40,7 +41,8 @@ async function main() {
         (item) => item.code.startsWith('60') || item.code.startsWith('00')
       )
       stockList = stockList.filter(
-        (item) => !item.name.includes('ST') && !item.name.startsWith('C')
+        (item) =>
+          !item.name.includes('ST') && !item.name.startsWith('C') && !item.name.startsWith('N')
       )
       if (stockList.length < 10) {
         return
@@ -74,7 +76,7 @@ async function main() {
       const { J } = calcKDJ(dailyData, 9)
       const zsz = zszMap[code].zsz
       const rate = +(redCount / greenCount).toFixed(2)
-      if (J < 56 && zsz > 50 && rate > 1 && ma13 > ma60) {
+      if (zsz > 30 && rate > 1 && ma13 > ma60) {
         bkResult.push({
           code,
           name: item.name,
