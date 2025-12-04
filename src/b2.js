@@ -2,7 +2,7 @@ const fs = require('node:fs')
 const path = require('node:path')
 
 const { DAILY_DIR, CODE_DIR, DAILY_CYB_DIR } = require('./config')
-const { calcKDJ, getStockPos } = require('./tools')
+const { calcKDJ } = require('./tools')
 
 function selectStocks(files, dir) {
   const zszMap = require(path.join(CODE_DIR, './zsz.json'))
@@ -34,7 +34,6 @@ function selectStocks(files, dir) {
       }
     })
     const code = file.replace('.json', '')
-    const pos = getStockPos(data)
     const { J } = calcKDJ(data, 9)
     const flag1 = maxVols.every((i) => i.pct_chg > 0)
     const flag2 = redCount > 1.2 * greenCount
@@ -44,7 +43,6 @@ function selectStocks(files, dir) {
     if (flag) {
       result.push({
         id: `${code}_${zszMap[code].name}`,
-        pos,
         rate: (redCount / greenCount).toFixed(2),
       })
     }

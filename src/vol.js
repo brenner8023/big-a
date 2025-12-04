@@ -2,7 +2,7 @@ const fs = require('node:fs')
 const path = require('node:path')
 
 const { DAILY_DIR, DAILY_CYB_DIR, CODE_DIR } = require('./config')
-const { calcKDJ, getSlope, getStockPos, getDidi, calcMa } = require('./tools')
+const { calcKDJ, getSlope, getDidi, calcMa } = require('./tools')
 
 function selectStocks(files, dir, redRatio) {
   const zszMap = require(path.join(CODE_DIR, './zsz.json'))
@@ -36,7 +36,6 @@ function selectStocks(files, dir, redRatio) {
     const code = file.replace('.json', '')
     const name = zszMap[code].name
     const slope = getSlope(data, 5).toFixed(4)
-    const pos = getStockPos(data)
     const { J } = calcKDJ(data, 9)
     const ma13 = calcMa(data, 13)
     const ma60 = calcMa(data, 60)
@@ -49,7 +48,6 @@ function selectStocks(files, dir, redRatio) {
     if (flag) {
       result.push({
         id: `${code}_${name}`,
-        pos,
         rate: (redCount / greenCount).toFixed(2),
       })
     }
