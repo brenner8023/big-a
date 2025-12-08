@@ -31,6 +31,6 @@ function main() {
     result.push({ id: name, score, rules: rules.join(',') })
   })
   result.sort((a, b) => b.score - a.score)
-  console.log(result)
+  console.log('持仓评分: ', result)
 }
 main()

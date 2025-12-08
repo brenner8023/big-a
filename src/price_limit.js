@@ -1,3 +1,8 @@
+const fs = require('node:fs')
+const path = require('node:path')
+
+const { CACHE_DIR } = require('./config')
+
 exports.getPriceLimit = async function () {
   const getUrl = (date) => {
     return `https://webrelease.dzh.com.cn/htmlweb/ztts/api.php?service=getZttdData&date=${date}`
@@ -5,27 +10,22 @@ exports.getPriceLimit = async function () {
   const headers = {
     'content-type': 'application/json',
   }
-  const dateMap = {
-    20251121: 20251121,
-    20251124: 20251124,
-    20251125: 20251125,
-    20251126: 20251126,
-    20251127: 20251127,
+  const dateArr = fs
+    .readdirSync(CACHE_DIR)
+    .filter((file) => path.extname(file) === '.json')
+    .map((file) => Number(file.replace('.json', '')))
+    .sort((a, b) => a - b)
+    .slice(-10)
 
-    20251128: 20251128,
-    20251201: 20251201,
-    20251202: 20251202,
-    20251203: 20251203,
-    20251204: 20251204,
-  }
-  const dateArr = Object.keys(dateMap)
   const resList = await Promise.all(dateArr.map((date) => fetch(getUrl(date), { headers })))
   const dataList = await Promise.all(resList.map((res) => res.json()))
   let countArr = []
   dataList.forEach((item) => {
     countArr.push(item.data.filter((stock) => !stock.name.includes('ST')).length)
   })
-  console.log('涨停板统计: ', countArr)
+  console.log(`${dateArr[0]}-${dateArr[dateArr.length - 1]}涨停板统计: `)
+  console.log(countArr)
   console.log('平均: ', countArr.reduce((a, b) => a + b, 0) / 10)
+  console.log('\n')
   return
 }
