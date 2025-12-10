@@ -17,6 +17,14 @@ exports.getPriceLimit = async function () {
     .sort((a, b) => a - b)
     .slice(-10)
 
+  const today = new Date()
+  const todayStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(
+    today.getDate()
+  ).padStart(2, '0')}`
+  if (dateArr[dateArr.length - 1] < Number(todayStr)) {
+    dateArr.push(Number(todayStr))
+  }
+
   const resList = await Promise.all(dateArr.map((date) => fetch(getUrl(date), { headers })))
   const dataList = await Promise.all(resList.map((res) => res.json()))
   let countArr = []
@@ -25,7 +33,7 @@ exports.getPriceLimit = async function () {
   })
   console.log(`${dateArr[0]}-${dateArr[dateArr.length - 1]}涨停板统计: `)
   console.log(countArr)
-  console.log('平均: ', countArr.reduce((a, b) => a + b, 0) / 10)
+  console.log('平均: ', countArr.reduce((a, b) => a + b, 0) / dateArr.length)
   console.log('\n')
   return
 }

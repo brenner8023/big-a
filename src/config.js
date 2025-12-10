@@ -25,16 +25,10 @@ exports.POSITIONS = [
   '603049.SH', // 中策橡胶
   '600570.SH', // 恒生电子
   '002756.SZ', // 永兴材料
-  '001222.SZ', // 源飞宠物
   '002979.SZ', // 雷赛智能
   '000400.SZ', // 许继电气
-  '600754.SH', // 锦江酒店
   '600986.SH', // 浙文互联
 ]
-
-exports.WORKDAYS = {
-  start: '2025-04-07',
-}
 
 exports.getAllStocks = () => [
   ...require(path.join(CODE_DIR, 'sz.json')),
