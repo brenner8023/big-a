@@ -50,7 +50,7 @@ function selectStocks(files, dir, redRatio) {
     const flag1 = maxVols.every((i) => i.pct_chg > 0)
     const flag2 = redCount > redRatio * greenCount
     const flag3 = (slope < 0.15 && slope > -0.15) || !getDidi(data)
-    const flag4 = zszMap[code].zsz > 30 && ma13 > ma60
+    const flag4 = zszMap[code].zsz > 30 && ma13[0] > ma60[0]
     const flag5 = vol5 < 0.6 * vol30
     const flag6 = J < 56
     const flag = flag1 && flag2 && flag3 && flag4 && flag5 && flag6

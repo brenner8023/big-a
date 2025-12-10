@@ -76,7 +76,7 @@ async function main() {
         }
       })
       const rate = +(redCount / greenCount).toFixed(2)
-      if (rate > 1 && J < 56 && ma13 > ma60) {
+      if (rate > 1 && J < 56 && ma13[0] > ma60[0]) {
         stockArr.push({
           code,
           name: stock.name,

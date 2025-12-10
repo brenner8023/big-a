@@ -2,9 +2,30 @@ const fs = require('node:fs')
 const path = require('node:path')
 
 const { DAILY_DIR, DAILY_CYB_DIR, CODE_DIR } = require('./config')
-const { calcKDJ, getSlope, getDidi, calcMa } = require('./tools')
+const { calcBollingerBands, calcMa } = require('./tools')
 
-function selectStocks(files, dir, redRatio) {
+function breakUpperBand(data) {
+  const { upperBand } = calcBollingerBands(data)
+  const close = data[data.length - 1][4]
+  const vol = data[data.length - 1][6]
+  const prevVol = data[data.length - 2][6]
+  const flag = close > upperBand && vol > prevVol
+  if (!flag) {
+    return false
+  }
+  for (let i = 10; i > 0; i--) {
+    const currData = data.slice(0, data.length - i)
+    const { upperBand: currUpperBand } = calcBollingerBands(currData)
+    const close = currData[currData.length - 1][4]
+    if (close > currUpperBand) {
+      // 前面10个交易日没有突破上轨，才往下走
+      return false
+    }
+  }
+  return true
+}
+
+function selectStocks(files, dir) {
   const zszMap = require(path.join(CODE_DIR, './zsz.json'))
   const result = []
   files.forEach((file) => {
@@ -14,7 +35,6 @@ function selectStocks(files, dir, redRatio) {
     const data = require(path.join(dir, file))
     let redCount = 0
     let greenCount = 0
-    const maxVols = []
     data.slice(-30).forEach((item) => {
       const pct_chg = item[5]
       const volume = item[6]
@@ -23,28 +43,17 @@ function selectStocks(files, dir, redRatio) {
       } else {
         greenCount += volume
       }
-      if (maxVols.length < 3) {
-        maxVols.push({ pct_chg, volume })
-      } else {
-        const minVol = Math.min(...maxVols.map((i) => i.volume))
-        if (volume > minVol) {
-          const minIndex = maxVols.findIndex((i) => i.volume === minVol)
-          maxVols[minIndex] = { pct_chg, volume }
-        }
-      }
     })
+
     const code = file.replace('.json', '')
     const name = zszMap[code].name
-    const slope = getSlope(data, 5).toFixed(4)
-    const { J } = calcKDJ(data, 9)
     const ma13 = calcMa(data, 13)
     const ma60 = calcMa(data, 60)
-    const flag1 = maxVols.every((i) => i.pct_chg > 0)
-    const flag2 = redCount > redRatio * greenCount
-    const flag3 = (slope < 0.15 && slope > -0.15) || !getDidi(data)
-    const flag4 = zszMap[code].zsz > 30 && ma13[0] > ma60[0]
-    const flag5 = J < 14
-    const flag = flag1 && flag2 && flag3 && flag4 && flag5 && flag5
+    const close = data[data.length - 1][4]
+
+    const flag1 = redCount > 1 * greenCount
+    const flag2 = zszMap[code].zsz > 100 && close > ma60[0] && close < 1.1 * ma13[0]
+    const flag = flag1 && flag2 && breakUpperBand(data)
     if (flag) {
       result.push({
         id: `${code}_${name}`,
@@ -60,7 +69,7 @@ function selectStocks(files, dir, redRatio) {
 function main() {
   const files = fs.readdirSync(DAILY_DIR)
   const cybFiles = fs.readdirSync(DAILY_CYB_DIR)
-  selectStocks(files, DAILY_DIR, 1.3)
-  selectStocks(cybFiles, DAILY_CYB_DIR, 1.5)
+  selectStocks(files, DAILY_DIR)
+  selectStocks(cybFiles, DAILY_CYB_DIR)
 }
 main()

@@ -189,3 +189,37 @@ function calcMa(data, period, onlyLast = true) {
   return ma
 }
 exports.calcMa = calcMa
+
+/**
+ * 计算布林带（Bollinger Bands）
+ * @param {Array} dailyData - 日线数据数组
+ * @param {number} period - 计算周期，默认为20
+ * @returns {Object} 包含布林带上轨、中轨、下轨的对象
+ */
+exports.calcBollingerBands = function (dailyData, period = 20) {
+  if (!dailyData || dailyData.length < period) {
+    return {
+      upperBand: null,
+      middleBand: null,
+      lowerBand: null,
+    }
+  }
+
+  const middleBand = calcMa(dailyData, period)[0]
+
+  // 计算标准差
+  const recentCloses = dailyData.slice(-period).map((item) => item[4])
+  const mean = middleBand
+  const variance = recentCloses.reduce((sum, close) => sum + Math.pow(close - mean, 2), 0) / period
+  const std = Math.sqrt(variance)
+
+  // 计算上轨和下轨
+  const upperBand = middleBand + 2 * std
+  const lowerBand = middleBand - 2 * std
+
+  return {
+    upperBand: +upperBand.toFixed(2),
+    middleBand: +middleBand.toFixed(2),
+    lowerBand: +lowerBand.toFixed(2),
+  }
+}
