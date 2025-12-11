@@ -25,7 +25,7 @@ function selectStocks(files, dir, redRatio) {
       } else {
         greenCount += volume
       }
-      if (maxVols.length < 3) {
+      if (maxVols.length < 1) {
         maxVols.push({ pct_chg, volume })
       } else {
         const minVol = Math.min(...maxVols.map((i) => i.volume))

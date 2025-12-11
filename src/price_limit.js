@@ -18,9 +18,10 @@ exports.getPriceLimit = async function () {
     .slice(-10)
 
   const today = new Date()
-  const todayStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(
+  let todayStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(
     today.getDate()
   ).padStart(2, '0')}`
+  todayStr = Number(todayStr).toFixed(2)
   if (dateArr[dateArr.length - 1] < Number(todayStr)) {
     dateArr.push(Number(todayStr))
   }

@@ -28,6 +28,10 @@ async function main() {
   const pList = []
   for (let i = 1; i <= 69; i++) {
     pList.push(fetch(getUrl(i, 80), { headers }))
+    if (i % 6 === 0) {
+      await new Promise((resolve) => setTimeout(resolve, 200))
+      console.log('fetch code ing:', i)
+    }
   }
   const resList = await Promise.all(pList)
   const result = await Promise.all(resList.map((item) => item.json()))
@@ -47,7 +51,7 @@ async function main() {
         ? item.symbol.replace('sh', '') + '.SH'
         : item.symbol.replace('sz', '') + '.SZ'
       if (sz || sh || isChiNext) {
-        const zsz = item.mktcap / 10000
+        const zsz = (item.mktcap / 10000).toFixed(2)
         zszMap[code] = {
           zsz,
           name: item.name,
