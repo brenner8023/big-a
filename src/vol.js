@@ -34,6 +34,9 @@ function selectStocks(files, dir, redRatio) {
       }
     })
     const code = file.replace('.json', '')
+    if (!zszMap[code]) {
+      console.log('not in zszMap:', code)
+    }
     const name = zszMap[code].name
     const slope = getSlope(data, 5).toFixed(4)
     const { J } = calcKDJ(data, 9)
@@ -60,7 +63,7 @@ function selectStocks(files, dir, redRatio) {
 function main() {
   const files = fs.readdirSync(DAILY_DIR)
   const cybFiles = fs.readdirSync(DAILY_CYB_DIR)
-  selectStocks(files, DAILY_DIR, 1.3)
+  selectStocks(files, DAILY_DIR, 1.5)
   selectStocks(cybFiles, DAILY_CYB_DIR, 1.5)
 }
 main()
