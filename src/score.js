@@ -1,7 +1,7 @@
 const path = require('node:path')
 
 const { DAILY_DIR, POSITIONS, CODE_DIR } = require('./config')
-const { calcBBI, getDidi } = require('./tools')
+const { calcBBI, getDidi, isRsiUp } = require('./tools')
 
 const zszMap = require(path.join(CODE_DIR, './zsz.json'))
 
@@ -25,6 +25,7 @@ function main() {
       didi ? 0 : 1, // 收盘价同时小于昨日最低价和前日收盘价
       volCount > 0 ? 1 : 0, // 5天内是否红肥绿瘦
       currClose >= bbi[bbi.length - 1] ? 1 : 0, // 收盘价是否在BBI上方
+      isRsiUp(dailyData) ? 1 : 0, // RSI是否多头排列
     ]
     const score = rules.reduce((total, curr) => total + curr, 0)
     const name = zszMap[code].name

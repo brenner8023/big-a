@@ -223,3 +223,68 @@ exports.calcBollingerBands = function (dailyData, period = 20) {
     lowerBand: +lowerBand.toFixed(2),
   }
 }
+
+/**
+ * 计算相对强弱指标（RSI）
+ * @param {Array} dailyData - 日线数据数组
+ * @param {number} period - 计算周期，默认为14
+ * @returns {number} RSI值
+ */
+function calcRSI(dailyData, period = 14) {
+  if (!dailyData || dailyData.length < period + 1) {
+    return 50 // 数据不足时返回默认值50
+  }
+
+  // 提取收盘价
+  const closes = dailyData.map((item) => item[4])
+
+  // 计算价格变化
+  const changes = []
+  for (let i = 1; i < closes.length; i++) {
+    changes.push(closes[i] - closes[i - 1])
+  }
+
+  // 计算平均上涨和平均下跌
+  let avgGain = 0
+  let avgLoss = 0
+
+  // 计算初始平均值
+  for (let i = 0; i < period; i++) {
+    if (changes[i] > 0) {
+      avgGain += changes[i]
+    } else {
+      avgLoss += Math.abs(changes[i])
+    }
+  }
+
+  avgGain /= period
+  avgLoss /= period
+
+  // 使用平滑平均计算剩余值
+  for (let i = period; i < changes.length; i++) {
+    const change = changes[i]
+    const gain = change > 0 ? change : 0
+    const loss = change < 0 ? Math.abs(change) : 0
+
+    avgGain = (avgGain * (period - 1) + gain) / period
+    avgLoss = (avgLoss * (period - 1) + loss) / period
+  }
+
+  // 计算RS和RSI
+  if (avgLoss === 0) {
+    return 100 // 避免除以零
+  }
+
+  const rs = avgGain / avgLoss
+  const rsi = 100 - 100 / (1 + rs)
+
+  return +rsi.toFixed(2)
+}
+exports.calcRSI = calcRSI
+
+exports.isRsiUp = function (dailyData) {
+  const rsi14 = calcRSI(dailyData)
+  const rsi28 = calcRSI(dailyData, 28)
+  const rsi57 = calcRSI(dailyData, 57)
+  return rsi14 >= rsi28 && rsi28 >= rsi57
+}

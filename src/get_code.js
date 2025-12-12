@@ -51,7 +51,7 @@ async function main() {
         ? item.symbol.replace('sh', '') + '.SH'
         : item.symbol.replace('sz', '') + '.SZ'
       if (sz || sh || isChiNext) {
-        const zsz = (item.mktcap / 10000).toFixed(2)
+        const zsz = +(item.mktcap / 10000).toFixed(2)
         zszMap[code] = {
           zsz,
           name: item.name,

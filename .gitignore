@@ -6,3 +6,6 @@ daily_cyb
 app/price_limit
 node_modules
 _bk.json
+code/sh.json
+code/sz.json
+code/chi_next.json
