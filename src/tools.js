@@ -254,3 +254,15 @@ exports.isRsiUp = function (dailyData) {
   const rsi57 = calcRSI(dailyData, 57)
   return rsi14 >= rsi28 && rsi28 >= rsi57
 }
+
+// 判断是否处于横盘状态
+exports.isSideway = function (dailyData) {
+  const rsiArr = []
+  rsiArr.push(calcRSI(dailyData))
+  rsiArr.push(calcRSI(dailyData.slice(0, -1)))
+  rsiArr.push(calcRSI(dailyData.slice(0, -2)))
+  rsiArr.push(calcRSI(dailyData.slice(0, -3)))
+  const max = Math.max(...rsiArr)
+  const min = Math.min(...rsiArr)
+  return max - min <= 10 && rsiArr[0] < 80
+}

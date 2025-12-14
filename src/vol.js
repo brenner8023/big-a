@@ -2,7 +2,7 @@ const fs = require('node:fs')
 const path = require('node:path')
 
 const { DAILY_DIR, DAILY_CYB_DIR, CODE_DIR } = require('./config')
-const { calcKDJ, getSlope, getDidi, calcMa } = require('./tools')
+const { calcKDJ, calcMa, isSideway } = require('./tools')
 
 function selectStocks(files, dir, redRatio) {
   const zszMap = require(path.join(CODE_DIR, './zsz.json'))
@@ -38,13 +38,12 @@ function selectStocks(files, dir, redRatio) {
       console.log('not in zszMap:', code)
     }
     const name = zszMap[code].name
-    const slope = getSlope(data, 5).toFixed(4)
     const { J } = calcKDJ(data, 9)
     const ma13 = calcMa(data, 13)
     const ma60 = calcMa(data, 60)
     const flag1 = maxVols.every((i) => i.pct_chg > 0)
     const flag2 = redCount > redRatio * greenCount
-    const flag3 = (slope < 0.15 && slope > -0.15) || !getDidi(data)
+    const flag3 = isSideway(data)
     const flag4 = zszMap[code].zsz > 30 && ma13[0] > ma60[0]
     const flag5 = J < 14
     const flag = flag1 && flag2 && flag3 && flag4 && flag5 && flag5
