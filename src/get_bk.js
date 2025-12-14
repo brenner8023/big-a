@@ -2,7 +2,7 @@ const fs = require('node:fs')
 const path = require('node:path')
 
 const { DAILY_DIR, DAILY_CYB_DIR, CODE_DIR } = require('./config')
-const { calcMa, calcKDJ } = require('./tools')
+const { calcKDJ, calcRSI, isRsiUp } = require('./tools')
 
 const zszMap = require(path.join(CODE_DIR, './zsz.json'))
 const headers = {
@@ -24,7 +24,7 @@ async function setItemsData(codeArr, bkMap) {
     const {
       data: { plate },
     } = item
-    const bkName = plate[1]?.name || plate[0]?.name || ''
+    const bkName = plate?.[1]?.name || plate?.[0]?.name || ''
     bkMap[bkName] = bkMap[bkName] || []
     bkMap[bkName].push({
       code,
@@ -59,11 +59,14 @@ async function main() {
     const stockArr = []
     stocks.forEach((stock) => {
       const code = stock.code
+      const name = zszMap[code].name
+      if (name.includes('ST')) {
+        return
+      }
       const dir = code.startsWith('30') ? DAILY_CYB_DIR : DAILY_DIR
       const dailyData = require(path.join(dir, `${code}.json`))
       const { J } = calcKDJ(dailyData, 9)
-      const ma13 = calcMa(dailyData, 13)
-      const ma60 = calcMa(dailyData, 60)
+      const rsi14 = calcRSI(dailyData, 14)
       let redCount = 0
       let greenCount = 0
       dailyData.slice(-30).forEach((item) => {
@@ -76,7 +79,7 @@ async function main() {
         }
       })
       const rate = +(redCount / greenCount).toFixed(2)
-      if (rate > 1 && J < 56 && ma13[0] > ma60[0]) {
+      if (rate > 1 && isRsiUp(dailyData) && rsi14 < 70) {
         stockArr.push({
           code,
           name: stock.name,
