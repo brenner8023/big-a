@@ -3,11 +3,47 @@ const fs = require('node:fs')
 
 const { CACHE_DIR, CODE_DIR, APP_DIR, CACHE_CYB_DIR } = require('./config')
 const zszMap = require(path.join(CODE_DIR, './zsz.json'))
-const { getPriceLimit } = require('./price_limit')
 
 const getMiddleData = (arr) => {
   const mid = Math.floor(arr.length / 2)
   return arr[mid]
+}
+
+const getPriceLimit = async function () {
+  const getUrl = (date) => {
+    return `https://webrelease.dzh.com.cn/htmlweb/ztts/api.php?service=getZttdData&date=${date}`
+  }
+  const headers = {
+    'content-type': 'application/json',
+  }
+  const dateArr = fs
+    .readdirSync(CACHE_DIR)
+    .filter((file) => path.extname(file) === '.json')
+    .map((file) => Number(file.replace('.json', '')))
+    .sort((a, b) => a - b)
+    .slice(-10)
+
+  const today = new Date()
+  let todayStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(
+    today.getDate()
+  ).padStart(2, '0')}`
+  todayStr = Number(todayStr).toFixed(2)
+  if (dateArr[dateArr.length - 1] < Number(todayStr)) {
+    dateArr.push(Number(todayStr))
+  }
+
+  const resList = await Promise.all(dateArr.map((date) => fetch(getUrl(date), { headers })))
+  const dataList = await Promise.all(resList.map((res) => res.json()))
+  let countArr = []
+  dataList.forEach((item) => {
+    countArr.push(item.data.filter((stock) => !stock.name.includes('ST')).length)
+  })
+  console.log(`${dateArr[0]}-${dateArr[dateArr.length - 1]}涨停板统计: `)
+  console.log(countArr)
+  const avgVal = countArr.reduce((a, b) => a + b, 0) / dateArr.length
+  console.log('平均: ', avgVal.toFixed(2))
+  console.log('\n')
+  return
 }
 
 async function main() {
