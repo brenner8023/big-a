@@ -3,6 +3,7 @@ const fs = require('node:fs')
 
 const { CACHE_DIR, CODE_DIR, APP_DIR, CACHE_CYB_DIR } = require('./config')
 const zszMap = require(path.join(CODE_DIR, './zsz.json'))
+const hs300 = require(path.join(CODE_DIR, './hs300.json'))
 
 const getMiddleData = (arr) => {
   const mid = Math.floor(arr.length / 2)
@@ -63,9 +64,14 @@ async function main() {
     const miniStocks = []
     const midStocks = []
     const largeStocks = []
+    const hs300Stocks = []
 
     arr.forEach((item) => {
       const code = item[1]
+      const name = item[0]
+      if (name.includes('ST')) {
+        return
+      }
       if (!zszMap[code]) {
         console.log('no zsz', code)
         return
@@ -78,15 +84,21 @@ async function main() {
       } else {
         largeStocks.push(item)
       }
+      const isHs300 = hs300.some((stock) => stock.code === code)
+      if (isHs300) {
+        hs300Stocks.push(item)
+      }
     })
 
     arr.sort((a, b) => b[7] - a[7])
     miniStocks.sort((a, b) => b[7] - a[7])
     midStocks.sort((a, b) => b[7] - a[7])
     largeStocks.sort((a, b) => b[7] - a[7])
+    hs300Stocks.sort((a, b) => b[7] - a[7])
 
     result.push({
       date,
+      hs300: getMiddleData(hs300Stocks)[7],
       all: getMiddleData(arr)[7],
       mini: getMiddleData(miniStocks)[7],
       mid: getMiddleData(midStocks)[7],

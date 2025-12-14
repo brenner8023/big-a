@@ -41,10 +41,9 @@ async function main() {
   const zszMap = {}
   result.forEach((arr) => {
     arr.forEach((item) => {
-      const st = item.name.includes('ST')
-      const sz = item.symbol.startsWith('sz0') && !st
-      const sh = item.symbol.startsWith('sh60') && !st
-      const isChiNext = item.symbol.startsWith('sz30') && !st
+      const sz = item.symbol.startsWith('sz0')
+      const sh = item.symbol.startsWith('sh60')
+      const isChiNext = item.symbol.startsWith('sz30')
       const code = isChiNext
         ? item.symbol.replace('sz', '') + '.SZ'
         : sh

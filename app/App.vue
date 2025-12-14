@@ -3,6 +3,7 @@
     {{ date }}: <br />
     全局：{{ all }} , 大盘股：{{ large }} , 中盘股：{{ mid }} , 小盘股：{{ mini }}
     <KLine title="全局-K线图" type="all" />
+    <KLine title="沪深300-K线图" type="hs300" />
     <KLine title="大盘股-K线图" type="large" />
     <KLine title="中盘股-K线图" type="mid" />
     <KLine title="小盘股-K线图" type="mini" />

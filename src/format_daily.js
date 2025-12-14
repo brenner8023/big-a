@@ -15,6 +15,9 @@ function main() {
     const cacheFile = path.join(CACHE_DIR, file)
     const dailyData = require(cacheFile)
     getAllStocks().forEach((stockItem) => {
+      if (stockItem.name.includes('ST')) {
+        return
+      }
       const code = stockItem.code
       const currData = dailyData[code]
       if (currData) {
