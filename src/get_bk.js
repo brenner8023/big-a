@@ -59,6 +59,10 @@ async function main() {
     const stockArr = []
     stocks.forEach((stock) => {
       const code = stock.code
+      if (!zszMap[code]) {
+        console.log(code)
+        return
+      }
       const name = zszMap[code].name
       if (name.includes('ST')) {
         return
