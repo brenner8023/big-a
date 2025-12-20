@@ -15,6 +15,7 @@ function selectStocks(files, dir, redRatio) {
     let redCount = 0
     let greenCount = 0
     const maxVols = []
+    let limitDownCount = 0
     data.slice(-30).forEach((item) => {
       const pct_chg = item[5]
       const volume = item[6]
@@ -23,14 +24,8 @@ function selectStocks(files, dir, redRatio) {
       } else {
         greenCount += volume
       }
-      if (maxVols.length < 1) {
-        maxVols.push({ pct_chg, volume })
-      } else {
-        const minVol = Math.min(...maxVols.map((i) => i.volume))
-        if (volume > minVol) {
-          const minIndex = maxVols.findIndex((i) => i.volume === minVol)
-          maxVols[minIndex] = { pct_chg, volume }
-        }
+      if (pct_chg < -8) {
+        limitDownCount++
       }
     })
     const code = file.replace('.json', '')
@@ -38,15 +33,16 @@ function selectStocks(files, dir, redRatio) {
       console.log('not in zszMap:', code)
     }
     const name = zszMap[code].name
+    const pct_chg = data[data.length - 1][5]
     const { J } = calcKDJ(data, 9)
     const ma13 = calcMa(data, 13)
     const ma60 = calcMa(data, 60)
-    const flag1 = maxVols.every((i) => i.pct_chg > 0)
+    const flag1 = limitDownCount === 0
     const flag2 = redCount > redRatio * greenCount
     const flag3 = isSideway(data)
     const flag4 = zszMap[code].zsz > 30 && ma13[0] > ma60[0]
-    const flag5 = J < 14
-    const flag = flag1 && flag2 && flag3 && flag4 && flag5 && flag5
+    const flag5 = J < 14 && pct_chg > -4 && pct_chg < 4
+    const flag = flag1 && flag2 && flag3 && flag4 && flag5
     if (flag) {
       result.push({
         id: `${code}_${name}`,
