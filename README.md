@@ -8,3 +8,17 @@
 ```js
 exports.TOKEN = '***'
 ```
+
+## 以图搜图
+
+绘制图片
+
+```bash
+python3 img_search/plot_stock.py -d daily
+```
+
+通过相似度查找
+
+```bash
+python3 img_search/batch_find_similar.py
+```
