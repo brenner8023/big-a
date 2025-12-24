@@ -47,7 +47,7 @@ def load_stock_data(json_file):
     return stock_code, data
 
 
-def parse_data(data, days=30):
+def parse_data(data, days=40):
     """
     数据格式: [日期, 开盘, 最高, 最低, 收盘, 涨跌幅, 成交量(万)]
     """
@@ -174,7 +174,7 @@ def plot_volume(ax, data, width=0.6):
     ax.set_title('成交量', fontsize=12, fontweight='bold')
 
 
-def plot_stock(json_file, output_dir='output', figsize=(14, 10), dpi=100, days=30, zsz_map=None):
+def plot_stock(json_file, output_dir='output', figsize=(14, 10), dpi=100, days=40, zsz_map=None):
     """
     绘制个股K线图和成交量图
     """
@@ -185,7 +185,7 @@ def plot_stock(json_file, output_dir='output', figsize=(14, 10), dpi=100, days=3
     print(f"加载数据: {json_file}")
     stock_code, raw_data = load_stock_data(json_file)
 
-    # 检查总市值是否符合条件（zsz > 40）
+    # 检查总市值是否符合条件（zsz > 90）
     if zsz_map is not None:
         if stock_code not in zsz_map:
             print(f"跳过: {stock_code} - 未在总市值数据中找到")
@@ -193,7 +193,7 @@ def plot_stock(json_file, output_dir='output', figsize=(14, 10), dpi=100, days=3
 
         zsz = zsz_map[stock_code].get('zsz', 0)
         if zsz <= 40:
-            print(f"跳过: {stock_code} - 总市值为 {zsz}亿，不满足>40亿的条件")
+            print(f"跳过: {stock_code} - 总市值为 {zsz}亿，不满足>90亿的条件")
             return None
 
     # 检查最近一天的涨跌幅是否符合条件（-3% < 涨跌幅 < 2.5%）
@@ -234,7 +234,7 @@ def plot_stock(json_file, output_dir='output', figsize=(14, 10), dpi=100, days=3
 
 
 def plot_multiple_stocks(json_dir, output_dir='img_search/output', pattern='*.json',
-                        figsize=(14, 10), dpi=100, days=30, zsz_file='code/zsz.json'):
+                        figsize=(14, 10), dpi=100, days=40, zsz_file='code/zsz.json'):
     """
     批量绘制多个股票的K线图
     """
@@ -290,7 +290,7 @@ def main():
     parser.add_argument('-r', '--dpi', type=int, default=100, help='图片分辨率(默认: 100)')
     parser.add_argument('-w', '--width', type=int, default=14, help='图片宽度(默认: 14)')
     parser.add_argument('-H', '--height', type=int, default=10, help='图片高度(默认: 10)')
-    parser.add_argument('--days', type=int, default=30, help='绘制最近N天的数据(默认: 30)')
+    parser.add_argument('--days', type=int, default=40, help='绘制最近N天的数据(默认: 40)')
     parser.add_argument('--zsz-file', default='code/zsz.json', help='总市值数据文件路径(默认: code/zsz.json)')
 
     args = parser.parse_args()
