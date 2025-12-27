@@ -61,7 +61,7 @@ function main() {
     avgJ /= stockArr.length
     avgRsi14 /= stockArr.length
     result.push({
-      bkName,
+      bk: bkName,
       avgRate: +avgRate.toFixed(2),
       avgJ: +avgJ.toFixed(2),
       avgRsi14: +avgRsi14.toFixed(2),
