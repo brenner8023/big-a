@@ -9,7 +9,7 @@
     "cyb": "node src/cyb_get_history.js",
     "history": "node src/get_history.js",
     "daily": "node src/format_daily.js && node src/cyb_format_daily.js",
-    "score": "pnpm analysis && node src/score.js",
+    "score": "pnpm bk && pnpm analysis && node src/score.js",
     "v1": "node src/vol.js",
     "v2": "node src/vol_v2.js",
     "b2": "node src/b2.js",
