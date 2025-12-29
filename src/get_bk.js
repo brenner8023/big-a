@@ -1,4 +1,3 @@
-const fs = require('node:fs')
 const path = require('node:path')
 
 const { DAILY_DIR, DAILY_CYB_DIR } = require('./config')

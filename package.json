@@ -11,7 +11,6 @@
     "daily": "node src/format_daily.js && node src/cyb_format_daily.js",
     "score": "pnpm bk && pnpm analysis && node src/score.js",
     "v1": "node src/vol.js",
-    "v2": "node src/vol_v2.js",
     "b2": "node src/b2.js",
     "bk": "node src/get_bk.js",
     "analysis": "node src/analysis.js",
