@@ -23,6 +23,7 @@ function selectStocks(files, dir, redRatio) {
     let targetDate = ''
     let v = 0
     data.slice(-15).forEach((item) => {
+      const high = item[2]
       const close = item[4]
       const pct_chg = item[5]
       const volume = item[6]
@@ -31,6 +32,7 @@ function selectStocks(files, dir, redRatio) {
         volume > 2.5 * avgVol &&
         ((close - minPrice) / (maxPrice - minPrice) < 0.3 || (close - minPrice) / minPrice < 0.2) &&
         (lastClose - close) / close < 0.3 &&
+        high - close < 0.04 * close &&
         zszMap[code].zsz > 80
       ) {
         targetDate = item[0]

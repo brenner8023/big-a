@@ -2,7 +2,7 @@ const fs = require('node:fs')
 const path = require('node:path')
 
 const { DAILY_DIR, DAILY_CYB_DIR, CODE_DIR } = require('./config')
-const { calcKDJ, calcMa, isSideway } = require('./tools')
+const { calcKDJ, calcMa } = require('./tools')
 
 function selectStocks(files, dir, redRatio) {
   const zszMap = require(path.join(CODE_DIR, './zsz.json'))
@@ -39,10 +39,9 @@ function selectStocks(files, dir, redRatio) {
     const ma60 = calcMa(data, 60)
     const flag1 = limitDownCount === 0
     const flag2 = redCount > redRatio * greenCount
-    const flag3 = isSideway(data)
-    const flag4 = zszMap[code].zsz > 30 && ma13[0] > ma60[0]
-    const flag5 = J < 14 && pct_chg > -4 && pct_chg < 4
-    const flag = flag1 && flag2 && flag3 && flag4 && flag5
+    const flag3 = zszMap[code].zsz > 50 && ma13[0] > ma60[0]
+    const flag4 = J < 14 && pct_chg > -4 && pct_chg < 4
+    const flag = flag1 && flag2 && flag3 && flag4
     if (flag) {
       result.push({
         id: `${code}_${name}`,

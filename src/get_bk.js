@@ -30,7 +30,7 @@ function main() {
       const rsi14 = calcRSI(dailyData, 14)
       let redCount = 0
       let greenCount = 0
-      dailyData.slice(-10).forEach((item) => {
+      dailyData.slice(-12).forEach((item) => {
         const pct_chg = item[5]
         const vol = item[6]
         if (pct_chg > 0) {
