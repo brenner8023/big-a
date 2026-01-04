@@ -49,6 +49,7 @@ function selectStocks(files, dir, redRatio) {
     }
   })
   result.sort((a, b) => b.v - a.v)
+  result.sort((a, b) => b.date - a.date)
   console.log(result)
   console.log(result.length)
 }

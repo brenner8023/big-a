@@ -14,14 +14,19 @@ function selectStocks(files, dir, redRatio) {
     const data = require(path.join(dir, file))
     let redCount = 0
     let greenCount = 0
-    const maxVols = []
+    const volArr = data
+      .slice(-30)
+      .map((item) => item[6])
+      .sort((a, b) => b - a)
+    const midVol = volArr[20]
     let limitDownCount = 0
     data.slice(-30).forEach((item) => {
       const pct_chg = item[5]
       const volume = item[6]
-      if (pct_chg > 0) {
+      if (pct_chg >= 0 && volume >= midVol) {
         redCount += volume
-      } else {
+      }
+      if (pct_chg < 0 && volume >= midVol) {
         greenCount += volume
       }
       if (pct_chg < -8) {
