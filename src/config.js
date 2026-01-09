@@ -17,15 +17,17 @@ exports.BK_DIR = path.join(root, './bk')
 exports.APP_DIR = path.join(root, './app')
 
 exports.UPDATE_CONFIG = {
-  start: '20251201',
-  end: '20260101',
+  start: '20260101',
+  end: '20260201',
 }
 
 exports.POSITIONS = [
-  '600570.SH', // 恒生电子
-  '000400.SZ', // 许继电气
-  '601066.SH', // 中信建投
-  '002415.SZ', // 海康威视
+  '000301.SZ', // 东方盛虹
+  '003019.SZ', // 宸展光电
+  '603992.SH', // 松霖科技
+  '600522.SH', // 中天科技
+  '603728.SH', // 鸣志电器
+  '603121.SH', // 华培动力
 ]
 
 exports.getAllStocks = () => [
