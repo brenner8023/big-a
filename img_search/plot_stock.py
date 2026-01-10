@@ -193,7 +193,7 @@ def plot_stock(json_file, output_dir='output', figsize=(14, 10), dpi=100, days=4
 
         zsz = zsz_map[stock_code].get('zsz', 0)
         if zsz <= 40:
-            print(f"跳过: {stock_code} - 总市值为 {zsz}亿，不满足>90亿的条件")
+            print(f"跳过: {stock_code} - 总市值为 {zsz}亿，不满足>40亿的条件")
             return None
 
     # 检查最近一天的涨跌幅是否符合条件（-3% < 涨跌幅 < 2.5%）
@@ -201,10 +201,10 @@ def plot_stock(json_file, output_dir='output', figsize=(14, 10), dpi=100, days=4
         print(f"跳过: {stock_code} - 数据为空")
         return None
 
-    latest_change = raw_data[-1][5]  # 涨跌幅在索引5
-    if latest_change <= -3 or latest_change >= 2.5:
-        print(f"跳过: {stock_code} - 最近一天涨跌幅为 {latest_change}%，不在[-3, 2.5]区间")
-        return None
+    # latest_change = raw_data[-1][5]  # 涨跌幅在索引5
+    # if latest_change <= -3 or latest_change >= 2.5:
+    #     print(f"跳过: {stock_code} - 最近一天涨跌幅为 {latest_change}%，不在[-3, 2.5]区间")
+    #     return None
 
     # 解析数据（只保留最近N天）
     data = parse_data(raw_data, days=days)
