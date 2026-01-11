@@ -55,14 +55,19 @@ function selectStocks(files, dir, redRatio) {
     }
   })
   result.sort((a, b) => b.rate - a.rate)
-  console.log(result)
-  console.log(result.length)
+  return result
 }
 
 function main() {
   const files = fs.readdirSync(DAILY_DIR)
   const cybFiles = fs.readdirSync(DAILY_CYB_DIR)
-  selectStocks(files, DAILY_DIR, 1.3)
-  selectStocks(cybFiles, DAILY_CYB_DIR, 1.3)
+  const dailyResult = selectStocks(files, DAILY_DIR, 1.3)
+  console.log(dailyResult)
+  console.log(dailyResult.length)
+  const data = dailyResult.map((item) => item.id.split('.')[0]).join(',')
+  fs.writeFileSync(path.join('./b1.txt'), data)
+  const cybResult = selectStocks(cybFiles, DAILY_CYB_DIR, 1.3)
+  console.log(cybResult)
+  console.log(cybResult.length)
 }
 main()
