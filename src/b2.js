@@ -30,13 +30,15 @@ function selectStocks(files, dir) {
         greenCount += volume
       }
     })
+    const currVol = data[data.length - 1][6]
+    const prevVol = data[data.length - 2][6]
     const code = file.replace('.json', '')
     const { J } = calcKDJ(data, 9)
-    const flag1 = ma13 > ma60
+    const flag1 = ma13 > ma60 && currVol > prevVol
     const flag2 = redCount > 1.2 * greenCount
     const flag3 = data[data.length - 1][5] > 3.7
     const flag4 = zszMap[code].zsz > 50
-    const flag = flag1 && flag2 && flag3 && flag4 && J < 80
+    const flag = flag1 && flag2 && flag3 && flag4 && J < 70
     if (flag) {
       result.push({
         id: `${code}_${zszMap[code].name}`,
