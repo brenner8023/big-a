@@ -142,7 +142,7 @@ exports.calcBBI = calcBBI
  * @param {string} code
  * @returns
  */
-function getStockPos(data) {
+exports.getStockAtr = function (data) {
   const trList = []
   if (data.length < 21) {
     // console.log('getStockPos:', code, data.length)
@@ -161,11 +161,8 @@ function getStockPos(data) {
   })
   const atr = trList.reduce((acc, cur) => acc + cur, 0) / trList.length
   const currClose = data[data.length - 1][4]
-  // 100w账户波动为0.5%
-  const result = (100 * 0.005) / (atr / currClose)
-  return +result.toFixed(2)
+  return +((atr / currClose) * 100).toFixed(2)
 }
-exports.getStockPos = getStockPos
 
 /**
  * 计算简单移动平均线（MA）

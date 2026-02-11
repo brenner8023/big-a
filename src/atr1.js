@@ -38,8 +38,7 @@ function selectStocks(files, dir, redRatio) {
       console.log('not in zszMap:', code)
     }
     const name = zszMap[code].name
-    const high = data[data.length - 1][2]
-    const low = data[data.length - 1][3]
+    const atr = getStockAtr(data)
     const pct_chg = data[data.length - 1][5]
     const vol = data[data.length - 1][6]
     const prevVol = data[data.length - 2][6]
@@ -48,14 +47,13 @@ function selectStocks(files, dir, redRatio) {
     const flag1 = limitDownCount === 0
     const flag2 = redCount > redRatio * greenCount
     const flag3 = zszMap[code].zsz > 50 && ma13[0] > ma60[0]
-    const flag4 = high > ma60[0] && low < ma60[0]
-    const flag5 = pct_chg <= 0 ? vol < prevVol : true
-    const flag = flag1 && flag2 && flag3 && flag4 && flag5
+    const flag4 = pct_chg < 0 && Math.abs(pct_chg) > atr && vol < prevVol * 0.8
+    const flag = flag1 && flag2 && flag3 && flag4
     if (flag) {
       result.push({
         id: `${code}_${name}`,
         rate: (redCount / greenCount).toFixed(2),
-        atr: getStockAtr(data),
+        atr,
       })
     }
   })

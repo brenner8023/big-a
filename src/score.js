@@ -1,7 +1,7 @@
 const path = require('node:path')
 
 const { DAILY_DIR, POSITIONS, CODE_DIR } = require('./config')
-const { calcBBI, getDidi, isRsiUp } = require('./tools')
+const { calcBBI, getDidi, isRsiUp, getStockAtr } = require('./tools')
 
 const zszMap = require(path.join(CODE_DIR, './zsz.json'))
 
@@ -29,7 +29,7 @@ function main() {
     ]
     const score = rules.reduce((total, curr) => total + curr, 0)
     const name = zszMap[code].name
-    result.push({ id: name, score, rules: rules.join(',') })
+    result.push({ id: name, score, rules: rules.join(','), atr: getStockAtr(dailyData) })
   })
   result.sort((a, b) => b.score - a.score)
   console.log('持仓评分: ', result)

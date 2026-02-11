@@ -2,7 +2,7 @@ const fs = require('node:fs')
 const path = require('node:path')
 
 const { DAILY_DIR, DAILY_CYB_DIR, CODE_DIR } = require('./config')
-const { calcKDJ, calcMa } = require('./tools')
+const { calcKDJ, calcMa, getStockAtr } = require('./tools')
 
 function selectStocks(files, dir, redRatio) {
   const zszMap = require(path.join(CODE_DIR, './zsz.json'))
@@ -51,6 +51,7 @@ function selectStocks(files, dir, redRatio) {
       result.push({
         id: `${code}_${name}`,
         rate: (redCount / greenCount).toFixed(2),
+        atr: getStockAtr(data),
       })
     }
   })
