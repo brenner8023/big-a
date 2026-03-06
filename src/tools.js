@@ -263,3 +263,91 @@ exports.isSideway = function (dailyData) {
   const min = Math.min(...rsiArr)
   return max - min <= 10 && rsiArr[0] < 80
 }
+
+/**
+ * 计算N周期内的最高值 (HHV - Highest High Value)
+ * @param {number[]} arr - 价格数组
+ * @param {number} n - 周期
+ * @param {number} index - 当前索引
+ * @returns {number} - N周期内的最高值
+ */
+function HHV(arr, n, index) {
+  const start = Math.max(0, index - n + 1)
+  let max = arr[start]
+  for (let i = start + 1; i <= index; i++) {
+    if (arr[i] > max) {
+      max = arr[i]
+    }
+  }
+  return max
+}
+exports.HHV = HHV
+
+/**
+ * 计算N周期内的最低值 (LLV - Lowest Low Value)
+ * @param {number[]} arr - 价格数组
+ * @param {number} n - 周期
+ * @param {number} index - 当前索引
+ * @returns {number} - N周期内的最低值
+ */
+function LLV(arr, n, index) {
+  const start = Math.max(0, index - n + 1)
+  let min = arr[start]
+  for (let i = start + 1; i <= index; i++) {
+    if (arr[i] < min) {
+      min = arr[i]
+    }
+  }
+  return min
+}
+exports.LLV = LLV
+
+/**
+ * 简单移动平均 (SMA - Simple Moving Average)
+ * @param {number[]} arr - 输入数组
+ * @param {number} n - 周期
+ * @param {number} m - 权重系数
+ * @returns {number[]} - SMA数组
+ */
+function SMA(arr, n, m) {
+  const result = []
+  let sma = arr[0]
+  for (let i = 0; i < arr.length; i++) {
+    sma = (m * arr[i] + (n - m) * sma) / n
+    result.push(sma)
+  }
+  return result
+}
+exports.SMA = SMA
+
+function calcRatio(data, redRatio) {
+  const volArr = data
+    .slice(-30)
+    .map((item) => item[6])
+    .sort((a, b) => b - a)
+  const midVol = volArr[20]
+
+  let redCount = 0
+  let greenCount = 0
+  let limitDownCount = 0
+
+  data.slice(-30).forEach((item) => {
+    const pct_chg = item[5]
+    const volume = item[6]
+    if (pct_chg >= 0 && volume >= midVol) {
+      redCount += volume
+    }
+    if (pct_chg < 0 && volume >= midVol) {
+      greenCount += volume
+    }
+    if (pct_chg < -8) {
+      limitDownCount++
+    }
+  })
+
+  return {
+    ratioFlag: limitDownCount === 0 && redCount > redRatio * greenCount,
+    ratio: (redCount / (greenCount || 1)).toFixed(2),
+  }
+}
+exports.calcRatio = calcRatio
