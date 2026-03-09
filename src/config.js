@@ -17,8 +17,8 @@ exports.BK_DIR = path.join(root, './bk')
 exports.APP_DIR = path.join(root, './app')
 
 exports.UPDATE_CONFIG = {
-  start: '20260205',
-  end: '20260301',
+  start: '20260301',
+  end: '20260401',
 }
 
 exports.POSITIONS = [
