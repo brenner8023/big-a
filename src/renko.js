@@ -113,7 +113,11 @@ function main() {
   const dailyResult = selectStocks(files, DAILY_DIR)
   console.log(dailyResult)
   console.log(dailyResult.length)
-  const data = dailyResult.map((item) => item.id.split('.')[0]).join(',')
+  const num = process.argv[2] || dailyResult.length
+  const data = dailyResult
+    .slice(0, num)
+    .map((item) => item.id.split('.')[0])
+    .join(',')
   fs.writeFileSync(path.join('./renko.txt'), data)
   const cybResult = selectStocks(cybFiles, DAILY_CYB_DIR)
   console.log(cybResult)
