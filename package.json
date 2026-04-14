@@ -8,11 +8,12 @@
     "sc": "node src/get_code.js",
     "cyb": "node src/cyb_get_history.js",
     "history": "node src/get_history.js",
+    "week": "node src/week_get.js && node src/week_format.js",
     "daily": "node src/format_daily.js && node src/cyb_format_daily.js",
     "score": "pnpm bk && pnpm analysis && node src/score.js",
     "b1": "node src/b1.js",
     "b2": "node src/b2.js",
-    "renko": "node src/renko.js",
+    "renko": "node src/renko_filter.js",
     "bk": "node src/get_bk.js",
     "analysis": "node src/analysis.js",
     "test": "echo \"Error: no test specified\" && exit 1"

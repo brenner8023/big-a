@@ -2,7 +2,11 @@ function calculateFundFlow(data) {
   const results = []
 
   for (let i = 0; i < data.length; i++) {
-    const { volume, high, low, close, open } = data[i]
+    const volume = data[i][6]
+    const high = data[i][2]
+    const low = data[i][3]
+    const close = data[i][4]
+    const open = data[i][1]
 
     // VAR1 = VOL / ((HIGH-LOW)*2 - ABS(CLOSE-OPEN))
     const var1 = volume / ((high - low) * 2 - Math.abs(close - open))
@@ -37,7 +41,7 @@ function calculateFundFlow(data) {
     const moneyOut = netFlow < 0 ? -netFlow : 0
 
     results.push({
-      date: data[i].date,
+      date: data[i][0],
       var1,
       var2,
       var3,
@@ -47,38 +51,26 @@ function calculateFundFlow(data) {
     })
   }
 
-  // 计算资金入30和资金出30
+  // 计算资金入20和资金出20
   for (let i = 0; i < results.length; i++) {
-    let moneyIn30 = 0
-    let moneyOut30 = 0
+    let moneyIn20 = 0
+    let moneyOut20 = 0
 
-    // 计算前30天的累加
-    for (let j = Math.max(0, i - 29); j <= i; j++) {
-      moneyIn30 += results[j].moneyIn
-      moneyOut30 += results[j].moneyOut
+    // 计算前20天的累加
+    for (let j = Math.max(0, i - 19); j <= i; j++) {
+      moneyIn20 += results[j].moneyIn
+      moneyOut20 += results[j].moneyOut
     }
 
     // 红肥
-    const redFat = moneyIn30 > 1.2 * moneyOut30
+    const redFat = moneyIn20 > 1.2 * moneyOut20
 
-    results[i].moneyIn30 = moneyIn30
-    results[i].moneyOut30 = moneyOut30
+    results[i].moneyIn20 = moneyIn20
+    results[i].moneyOut20 = moneyOut20
     results[i].redFat = redFat
   }
 
   return results
 }
 
-// 示例用法
-/*
-const sampleData = [
-  { date: '2023-01-01', open: 100, high: 110, low: 95, close: 105, volume: 1000000 },
-  { date: '2023-01-02', open: 105, high: 115, low: 100, close: 110, volume: 1200000 },
-  // 更多数据...
-];
-
-const result = calculateFundFlow(sampleData);
-console.log(result);
-*/
-
-export default calculateFundFlow
+module.exports = calculateFundFlow
