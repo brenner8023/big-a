@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "fund": "node funds/main.js",
     "dev": "vite",
     "sc": "node src/get_code.js",
     "cyb": "node src/cyb_get_history.js",
