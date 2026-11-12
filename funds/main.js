@@ -1,6 +1,7 @@
 const axios = require('axios')
 const cheerio = require('cheerio')
 const { FUND_LIST, CLOSE_TEXTS } = require('./const.js')
+const { getBaseData } = require('./filter.js')
 
 function getSumNum($) {
   return +$('#position_shares .sum-num').text().trim().replace('%', '')
@@ -9,6 +10,7 @@ function getSumNum($) {
 async function checkFundBuyLimit() {
   console.log(`开始检查 ${FUND_LIST.length} 个基金的购买限制...\n`)
 
+  const baseData = await getBaseData()
   const fundsWithoutLimit = []
   let curr = 0
 
@@ -26,15 +28,15 @@ async function checkFundBuyLimit() {
       const buyWayStatic = $('.buyWayStatic .staticCell').text().trim()
       const fundTotalText = $('.infoOfFund td').eq(1).text().trim()
       const fundTotal = Number.parseFloat(fundTotalText.match(/([\d.]+)(?=亿元)/)?.[1] || 0)
-      const sumNum = getSumNum($)
+      const sumNum = getSumNum($) // 前十持仓占比
       const NumOfMonth3 = +$('.dataOfFund .dataItem02 dd')
         .eq(1)
         .find('.ui-num')
         .text()
         .trim()
         .replace('%', '')
-      const NumOfMonth6 = +$('.dataOfFund .dataItem03 dd')
-        .eq(1)
+      const NumOfYear3 = +$('.dataOfFund .dataItem02 dd')
+        .eq(2)
         .find('.ui-num')
         .text()
         .trim()
@@ -44,15 +46,15 @@ async function checkFundBuyLimit() {
       if (
         !CLOSE_TEXTS.some((text) => buyWayStatic.includes(text)) &&
         sumNum < 20 &&
-        fundTotal > 0.5 &&
+        fundTotal > 0.2 &&
         !Number.isNaN(NumOfMonth3) &&
-        !Number.isNaN(NumOfMonth6)
+        !Number.isNaN(NumOfYear3)
       ) {
         fundsWithoutLimit.push({
           name: fund.name,
           url: fund.url,
           NumOfMonth3,
-          NumOfMonth6,
+          NumOfYear3,
           fundTotal,
         })
       }
@@ -65,25 +67,21 @@ async function checkFundBuyLimit() {
     }
   }
 
-  // 筛选逻辑：先按NumOfMonth3排序取前1/2，再按NumOfMonth6排序取前1/2
   const count6 = Math.ceil(fundsWithoutLimit.length / 2)
-  const topByMonth6 = fundsWithoutLimit
+  const finalFunds = fundsWithoutLimit
+    .filter(
+      (fund) => fund.NumOfMonth3 > baseData.baseOfMonth3 && fund.NumOfYear3 > baseData.baseOfYear3,
+    )
     .slice()
-    .sort((a, b) => b.NumOfMonth6 - a.NumOfMonth6)
+    .sort((a, b) => b.NumOfYear3 - a.NumOfYear3)
     .slice(0, count6)
-
-  const count3 = Math.ceil(topByMonth6.length / 2)
-  const finalFunds = topByMonth6
-    .slice()
-    .sort((a, b) => b.NumOfMonth3 - a.NumOfMonth3)
-    .slice(0, count3)
 
   console.log(`\n========== 筛选后的结果 ==========`)
   finalFunds.forEach((fund) => {
     console.log(`${fund.name}`)
     console.log(`  URL: ${fund.url}`)
     console.log(
-      `  近3月涨幅: ${fund.NumOfMonth3}%  近6月涨幅: ${fund.NumOfMonth6}%  规模: ${fund.fundTotal}亿\n`,
+      `  近3月涨幅: ${fund.NumOfMonth3}%  近3年涨幅: ${fund.NumOfYear3}%  规模: ${fund.fundTotal}亿\n`,
     )
   })
 
